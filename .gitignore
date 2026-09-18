@@ -1,0 +1,48 @@
+# Gradle generated files and caches
+.gradle/
+build/
+**/build/
+
+# Local Android SDK configuration and machine-specific credentials
+local.properties
+keystore.properties
+*.jks
+*.keystore
+*.p12
+*.pem
+
+# IDE files
+.idea/
+*.iml
+.vscode/
+
+# Android Studio / IntelliJ generated files
+captures/
+.externalNativeBuild/
+.cxx/
+
+# APKs, app bundles, and packaged artifacts
+*.apk
+*.aab
+*.ap_
+*.aar
+
+# Native build and profiling artifacts
+*.hprof
+*.so
+obj/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs and temporary files
+*.log
+*.tmp
+*.swp
+*~
+
+# Firebase / Google service files commonly containing environment-specific config
+# Uncomment if these files should never be versioned:
+# google-services.json
+# GoogleService-Info.plist
