@@ -1,0 +1,7 @@
+interface:
+  display_name: "Android Review"
+  short_description: "Diff-first code review workflow for AndroidBase."
+  default_prompt: "Use $android-review to review an AndroidBase diff, MR or change set."
+
+policy:
+  allow_implicit_invocation: true

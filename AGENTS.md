@@ -3,6 +3,20 @@
 > 本文件是给 AI 编程助手（Claude Code、Codex、Cursor 等）的项目上下文。
 > 开始在本仓库写代码之前，请先完整阅读本文件。
 
+## 0. 事实源与 AI 资产索引
+
+| 信息 | 唯一事实源 |
+|---|---|
+| 项目开发约定（本文件） | `AGENTS.md` |
+| 技术栈 | `.dhcoder/rules/tech_stack.md`、`gradle/libs.versions.toml` |
+| 架构与分层边界 | `.dhcoder/rules/architecture.md` |
+| 编码风格 | `.dhcoder/rules/code-style.md` |
+| 通用 Skills | `.dhcoder/skills/` |
+| 评审入口 | `REVIEW.md` |
+| 输出语言 | `.dhcoder/config.yaml`（简体中文） |
+
+> `AGENTS.md` 是任务路由与上下文披露顺序的唯一入口；调整流程时优先改本文件。
+
 ## 项目概览
 
 基于 **Kotlin + Jetpack Compose + Clean Architecture + MVVM** 的可运行 Android 基础工程。
@@ -66,6 +80,76 @@ com/androidbase/
 
 - 目前仅 **JUnit4** 单元测试（`app/src/test`，含基础 `ApiResult` 用例）。
 - 新增领域逻辑 / 仓库逻辑时**优先补单元测试**；UI 测试与 androidTest 尚未接入。
+
+## AI 工作流
+
+### 会话启动顺序（Just-in-Time，禁止无目的加载整个仓库）
+
+1. 读取本文件 `AGENTS.md`。
+2. 读取 `.dhcoder/rules/` 下与当前任务相关的规则（改代码前：`tech_stack.md`、`architecture.md`、`code-style.md`）。
+3. 按任务关键词读取命中的 `.dhcoder/skills/<skill>/SKILL.md`，再读其按需路由的 references。
+4. 代码评审前额外读取 `REVIEW.md`。
+
+### 任务分级
+
+| 等级 | 场景 | 流程 |
+|---|---|---|
+| L0 | 问答、只读分析、状态查询，无任何实现性副作用 | 只给结论，不改文件 |
+| L1 | 低风险局部小改（1–3 个同模块文件，不改对外接口/数据/路由） | 会话内 3–5 行 mini-spec → 实施 → Self Check |
+| L2 | 多文件、多步骤或需要方案权衡 | 先 Spec（`prd-to-spec`）→ 用户确认 → 分步计划（`writing-plans`）→ 实施 → 验证 |
+| L3 | 核心链路或大范围改造 | L2 流程 + 一次独立评审（`android-review`） |
+
+- 需求有多种解释、涉及核心链路或显著外部影响时，不论等级都必须先与用户确认。
+- 分级只决定工作流，不替代文件范围、破坏性操作或权限授权。
+
+### 执行闭环
+
+1. 先做只读审查，再做最小闭环改动。
+2. 编码前说清假设和不确定项。
+3. 最小实现，不预埋未来扩展，不顺手重构无关内容。
+4. 改完必须自检并给出验证证据（命令 + 结果），不能只写“已验证”。
+
+### 必须遵守
+
+- 新增或修改代码必须遵守 `.dhcoder/rules/` 中的架构与编码约束。
+- 只做用户明确要求，只改与任务直接相关的代码。
+- 完成时记录验证证据：命令、结果、失败原因或可观测行为。
+
+### 严禁事项
+
+- 未经明确要求做大规模重构或跨模块迁移。
+- 绕过统一架构自建并行路径。
+- 生产代码捏造数据或混入 mock/临时调试入口。
+- 修改生成文件或依赖锁文件（除非用户明确要求）。
+
+### 输出要求（L1 及以上）
+
+1. 改动摘要
+2. 受影响文件
+3. 验证情况
+4. 风险与后续建议
+5. 本次 Skill 复用/新增情况（无则写“无”）
+
+### Skill 分层与路由
+
+- Skills 位于 `.dhcoder/skills/<name>/SKILL.md`；同名时项目 Skill 优先。
+- 选定 Skill 后必须在执行前完整读取其 `SKILL.md`。
+- 通用 Skill 触发规则：
+  - `diagnose`：出现 Bug、报错、失败或性能回退。
+  - `tdd`：要求测试先行，或功能/修复需要先写测试。
+  - `to-prd` / `to-issues`：把讨论沉淀为 PRD，或拆成可独立执行的任务。
+  - `triage`：对需求/缺陷做状态分流。
+  - `zoom-out`：需要先看全局结构与模块关系。
+  - `prototype`：需求不稳定，先做可运行草案验证方向。
+  - `improve-codebase-architecture`：明确要做架构优化或解耦。
+  - `prd-to-spec` → `writing-plans`：需求 → 技术 Spec → 分步实现计划。
+  - `grill-me` / `grill-with-docs`：需要高强度审视方案与边界。
+  - `caveman`：用户明确要求极简输出。
+  - Android 专项：`android-native-dev`（开发/排障）、`android-verify`（编译/测试/验证）、`android-review`（评审）。
+
+## 代码评审
+
+评审默认只读；任务为 review / diff review / MR review 时，先读 `REVIEW.md`，再按 `.dhcoder/skills/android-review/SKILL.md` 执行。
 
 ## 变更纪律
 

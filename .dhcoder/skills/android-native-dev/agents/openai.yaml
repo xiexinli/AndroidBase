@@ -1,0 +1,7 @@
+interface:
+  display_name: "Android Native Dev"
+  short_description: "Repo-aware Android development guidance for AndroidBase."
+  default_prompt: "Use $android-native-dev for AndroidBase Android development, build troubleshooting, and repo-specific project setup guidance."
+
+policy:
+  allow_implicit_invocation: true

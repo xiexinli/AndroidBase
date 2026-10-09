@@ -1,0 +1,4 @@
+interface:
+  display_name: "PRD架构映射"
+  short_description: "读取PRD并结合代码定位改动范围输出架构方案草稿版"
+  default_prompt: "先读取 PRD 并抽取功能改动，再结合目标仓库映射影响模块，最后输出可执行的技术方案草稿与验证清单"

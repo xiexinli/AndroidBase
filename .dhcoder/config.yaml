@@ -1,0 +1,4 @@
+output:
+  language: zh-Hans
+  language_name: Simplified Chinese
+  user_visible_rule: All user-facing review prose must be Simplified Chinese. Keep file paths, code identifiers, API names, and enum values unchanged. Do not write English review prose.

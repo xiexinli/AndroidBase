@@ -1,0 +1,7 @@
+interface:
+  display_name: "Android Verify"
+  short_description: "Gradle compile, unit-test and build verification guidance for AndroidBase."
+  default_prompt: "Use $android-verify to pick the narrowest Gradle verification for an AndroidBase change."
+
+policy:
+  allow_implicit_invocation: true

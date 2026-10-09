@@ -70,6 +70,26 @@ suspend fun refreshOrders(): ApiResult<List<Order>> = withContext(io) {
 
 > 多域名/超时规则集中维护在 `core/network/HostConfig.kt`，接入真实后端时改这一个文件即可。
 
+## AI 助手配置（`.dhcoder/`）
+
+参考 AndroidBuyer 的 AgentKit 抽取、并按本工程实际技术栈改写后的通用 AI 配置：
+
+| 资产 | 说明 |
+| --- | --- |
+| `AGENTS.md` | 项目上下文与 AI 工作流（任务分级 L0–L3、执行闭环、输出要求、Skill 路由） |
+| `.dhcoder/rules/` | `tech_stack.md`、`architecture.md`、`code-style.md` |
+| `.dhcoder/skills/` | 通用工作流 skills + Android 专项 skills |
+| `.dhcoder/config.yaml` | 输出语言（简体中文） |
+| `REVIEW.md` | 代码评审入口 |
+
+已内置的 skills：
+
+- 通用工作流：`diagnose`、`tdd`、`to-prd`、`to-issues`、`triage`、`zoom-out`、`prototype`、`improve-codebase-architecture`、`planning-with-files`、`grill-me`、`grill-with-docs`、`caveman`、`app-grill-pm`、`prd-code-impact-architect`、`setup-matt-pocock-skills`
+- 需求 → 交付：`prd-to-spec`、`writing-plans`
+- Android 专项：`android-native-dev`（开发/排障）、`android-verify`（编译/测试/验证）、`android-review`（评审）
+
+> 未内置的 AndroidBuyer 专有资产（cart/order/checkout/home-module review、engage-sdk、r8-analyzer、GitLab AI review）以及其 AgentKit SDD 治理框架（task-level / prd-to-app-spec / subagents / WORKFLOW.md），因与本工程业务无关或依赖其自有工具链而**未**移植。
+
 ## 后续建议
 
 分页列表引入 Paging 3；业务增长后按 `core/data/domain/feature` 拆为 Gradle 模块，并加入 Detekt/Ktlint、Crashlytics/Sentry、CI 与 UI 测试。
