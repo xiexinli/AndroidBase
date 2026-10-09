@@ -53,7 +53,10 @@ com/androidbase/
 
 ## 关键实现要点与坑
 
-- **Token 注入**：`AuthInterceptor` 从 DataStore 读 token，自动加 `Authorization: Bearer <token>`。
+- **Token 注入**：`AuthInterceptor` 从 DataStore 读 token，自动加 `Authorization: Bearer <token>`；已显式携带 Authorization 的请求不覆盖。与身份无关的公共头在 `CommonHeaderInterceptor`。
+- **统一响应/异常**：带业务信封的接口用 `core/network` 的 `ApiResponse<T>` + `apiEnvelopeCall`；异常经 `NetworkExceptionEngine` 归一化为 `NetworkException`（`ApiResult.Error.bizCode` 携带业务码）。
+- **动态域名 / 超时**：接口写 `@Headers("url:key")` 由 `DynamicHostInterceptor` 切换域名；按接口超时规则、域名映射统一维护在 `core/network/HostConfig.kt`。
+- **网络状态**：`NetworkMonitor`（需 `ACCESS_NETWORK_STATE`，已在 Manifest 声明）提供 `isConnected()` 与 `isOnline` Flow，请求前判断或 UI 断网提示。
 - **刷新 Token**：目前是业务占位。需在 OkHttp `Authenticator` 或专门的 `TokenRefreshManager` 实现串行刷新；刷新失败后 `UserPreferences.clear()` 并导航到登录页。
 - **环境切换**：`API_BASE_URL` 由 `app/build.gradle.kts` 的 `buildConfigField` 注入（当前为 jsonplaceholder 示例地址）。接入真实后端时改这里，或按 debug/staging/release 分环境。
 - **Debug 变体**：`applicationId` 带 `.debug` 后缀，`versionName` 带 `-debug`。
