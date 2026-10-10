@@ -1,0 +1,9 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!--
+      Library 模块清单：只声明本模块自身需要的权限，不包含 application / Activity。
+      宿主的启动 Activity、Application 与主题由各业务 App 模块自行提供，清单会合并。
+    -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+</manifest>
