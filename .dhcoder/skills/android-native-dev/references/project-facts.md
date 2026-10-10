@@ -7,7 +7,8 @@ Read this file first when using `android-native-dev` in this repository.
 - Build files are **Kotlin DSL**:
   - `settings.gradle.kts`
   - `build.gradle.kts`
-  - `app/build.gradle.kts`
+  - `base/build.gradle.kts`（`:base` library）
+  - `app/build.gradle.kts`（`:app` application shell）
 - Gradle wrapper is already present in the repository.
 - This is a runnable template project, not an empty scaffold: a working Compose + Hilt + Retrofit + Room + Coil + WorkManager sample is already wired end to end.
 
@@ -19,10 +20,11 @@ AndroidBase/
 ├── build.gradle.kts
 ├── gradle.properties
 ├── gradle/libs.versions.toml   # 依赖版本的唯一事实源（Version Catalog）
-└── app/                        # 唯一模块（单模块工程）
+├── base/                       # com.android.library，包名 com.development.base —— 可复用依赖库
+└── app/                        # com.android.application，包名 com.development.app —— 应用壳
 ```
 
-Single module `:app`. Do not invent extra Gradle modules unless the user explicitly asks.
+Two modules: `:base`（library，承载 core/data/domain/feature 与全部依赖，含 `open class BaseApplication` 承担 Timber 等公共初始化）和 `:app`（application，只放 `AppApplication`（`@HiltAndroidApp`，继承 `:base` 的 `BaseApplication`）、`MainActivity`、res 与宿主 Hilt 配置，通过 `implementation(project(":base"))` 依赖 `:base`）。Hilt 强制要求 `@HiltAndroidApp` 必须位于 application 模块，无法下沉到 library。Do not invent extra Gradle modules unless the user explicitly asks.
 
 ## Toolchain Snapshot
 
@@ -50,7 +52,7 @@ All versions live in `gradle/libs.versions.toml`. **Never** hardcode a dependenc
 - No product flavors.
 - Build types: `debug`, `release`.
 - `debug` adds `applicationIdSuffix = ".debug"` and `versionNameSuffix = "-debug"`.
-- `API_BASE_URL` is injected via `buildConfigField` in `app/build.gradle.kts`.
+- `API_BASE_URL` is injected via `buildConfigField` in `app/build.gradle.kts`, then assembled into `HostConfig` by `app/src/main/java/com/development/app/di/AppNetworkModule.kt` and provided to `:base`。`:base` 不硬编码任何域名。
 - `buildFeatures { compose = true; buildConfig = true }`.
 
 ## UI Stack
@@ -61,15 +63,17 @@ All versions live in `gradle/libs.versions.toml`. **Never** hardcode a dependenc
 
 ## Architecture
 
-Clean Architecture single module, three layers under `app/src/main/java/com/androidbase/`:
+Clean Architecture lives in the `:base` library — four layers under `base/src/main/java/com/development/base/`:
 
 ```
-com/androidbase/
+com/development/base/
 ├── core/     # network、database、datastore、ui、worker、common（跨层基础设施）
 ├── data/     # remote DTO、local Entity/DAO、Repository 实现（仅此层可访问网络/数据库）
 ├── domain/   # model、Repository 接口、UseCase（纯 Kotlin，不依赖 Android 框架）
 └── feature/  # 页面 Screen 与 ViewModel（按业务 feature 分包）
 ```
+
+`:app` 只保留应用壳（`app/src/main/java/com/development/app/`：`AppApplication`、`MainActivity`、`di/AppNetworkModule`）；公共 `Application` 初始化在 `:base` 的 `BaseApplication`（`open`，无 Hilt 注解）。
 
 Dependency direction: `feature → domain ← data`; `feature`/`data` may depend on `core`; `domain` must not depend on any Android framework.
 
@@ -92,19 +96,21 @@ Use the narrowest proof for the change:
 
 ```bash
 git diff --check -- <touched files...>
-./gradlew :app:compileDebugKotlin
+./gradlew :base:compileDebugKotlin      # :base 代码改动
+./gradlew :app:compileDebugKotlin       # :app 壳改动
 ```
 
 Use broader proof only when needed:
 
 ```bash
-./gradlew :app:assembleDebug
-./gradlew :app:testDebugUnitTest
+./gradlew :app:assembleDebug            # 打包 APK（含 :base）
+./gradlew :base:assembleDebug           # 单独产出 :base 的 AAR
+./gradlew :base:testDebugUnitTest       # 单元测试位于 :base
 ```
 
 ## Repository-Specific Gotchas
 
-- There are no flavors here, so `compileDebugKotlin` / `assembleDebug` / `testDebugUnitTest` are unambiguous — use them directly.
+- There are no flavors here, so `compileDebugKotlin` / `assembleDebug` / `testDebugUnitTest` are unambiguous — prefix them with the module (`:base:` or `:app:`). Unit tests live in `:base`.
 - `assemble*` needs a valid Android SDK path in `local.properties` (not committed).
 - Dependency resolution errors usually mean a missing/incorrect entry in `gradle/libs.versions.toml`, not a build-script typo.
 - Adding a dependency requires editing the Version Catalog and the `dependencies { }` block — both.

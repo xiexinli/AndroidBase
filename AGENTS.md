@@ -20,7 +20,8 @@
 ## 项目概览
 
 基于 **Kotlin + Jetpack Compose + Clean Architecture + MVVM** 的可运行 Android 基础工程。
-单模块（`:app`），定位为新业务项目的起点模板：已打通 UI / 状态 / DI / 网络 / 缓存 / 后台任务的全链路样例。
+双模块：`:base` 是可被复用的依赖库（基础设施 + 全链路样例），`:app` 是薄的应用壳（只放 Application / Activity / 资源）。
+定位为新业务项目的起点模板：已打通 UI / 状态 / DI / 网络 / 缓存 / 后台任务的全链路样例。
 
 ## 技术栈（版本以 `gradle/libs.versions.toml` 为唯一事实源）
 
@@ -34,25 +35,34 @@
 - Timber（日志，不直接使用 `android.util.Log`）
 - `minSdk 24` / `targetSdk 35` / `compileSdk 35`，JVM toolchain **17**
 
-## 目录结构（`app/src/main/java/com/androidbase/`）
+## 目录结构
 
+```text
+AndroidBase/
+├── base/                       # com.android.library，包名 com.development.base —— 被依赖的库
+│   └── src/main/java/com/development/base/
+│       ├── core/       # network、database、datastore、ui、worker、common（跨层基础设施）
+│       ├── data/       # remote DTO、local Entity/DAO、Repository 实现（仅此层可访问网络/数据库）
+│       ├── domain/     # model、Repository 接口、UseCase（纯 Kotlin，不依赖 Android 框架）
+│       └── feature/    # 页面 Screen 与 ViewModel（按业务 feature 分包，如 home）
+└── app/                        # com.android.application，包名 com.development.app —— 应用壳
+    └── src/main/java/com/development/app/   # AppApplication、MainActivity、di/AppNetworkModule
 ```
-com/androidbase/
-├── core/       # network、database、datastore、ui、worker、common（跨层基础设施）
-├── data/       # remote DTO、local Entity/DAO、Repository 实现（仅此层可访问网络/数据库）
-├── domain/     # model、Repository 接口、UseCase（纯 Kotlin，不依赖 Android 框架）
-└── feature/    # 页面 Screen 与 ViewModel（按业务 feature 分包，如 home）
-```
+
+`:base` 不感知宿主：默认域名等运行期配置由宿主 App 通过 Hilt 提供（见「关键实现要点」）。
+应用级入口类 `BaseApplication` 位于 `:base`（承载 Timber 等公共初始化），`:app` 的 `AppApplication`
+只承接 Hilt 的 `@HiltAndroidApp` 注解。
 
 ## 构建 / 测试命令
 
 ```bash
-./gradlew :app:assembleDebug          # 编译 Debug
+./gradlew :app:assembleDebug          # 编译 Debug（含 :base）
 ./gradlew :app:installDebug           # 安装到设备
-./gradlew testDebugUnitTest           # 跑单元测试
+./gradlew :base:testDebugUnitTest     # 跑单元测试（测试位于 :base）
 ```
 - 打开项目需本地 Android SDK，路径在 `local.properties`（不入库）。
 - 全部依赖版本集中在 `gradle/libs.versions.toml`（Version Catalog），**禁止**在 `build.gradle.kts` 写裸版本号。
+- `:base` 产出 AAR（`./gradlew :base:assembleDebug`），`:app` 产出 APK。
 
 ## 架构约束（新增代码必须遵守）
 
@@ -69,16 +79,17 @@ com/androidbase/
 
 - **Token 注入**：`AuthInterceptor` 从 DataStore 读 token，自动加 `Authorization: Bearer <token>`；已显式携带 Authorization 的请求不覆盖。与身份无关的公共头在 `CommonHeaderInterceptor`。
 - **统一响应/异常**：带业务信封的接口用 `core/network` 的 `ApiResponse<T>` + `apiEnvelopeCall`；异常经 `NetworkExceptionEngine` 归一化为 `NetworkException`（`ApiResult.Error.bizCode` 携带业务码）。
-- **动态域名 / 超时**：接口写 `@Headers("url:key")` 由 `DynamicHostInterceptor` 切换域名；按接口超时规则、域名映射统一维护在 `core/network/HostConfig.kt`。
+- **动态域名 / 超时**：接口写 `@Headers("url:key")` 由 `DynamicHostInterceptor` 切换域名；域名映射与按接口超时规则统一维护在 `core/network/HostConfig.kt`（实例由宿主 App 提供）。
 - **网络状态**：`NetworkMonitor`（需 `ACCESS_NETWORK_STATE`，已在 Manifest 声明）提供 `isConnected()` 与 `isOnline` Flow，请求前判断或 UI 断网提示。
 - **刷新 Token**：目前是业务占位。需在 OkHttp `Authenticator` 或专门的 `TokenRefreshManager` 实现串行刷新；刷新失败后 `UserPreferences.clear()` 并导航到登录页。
-- **环境切换**：`API_BASE_URL` 由 `app/build.gradle.kts` 的 `buildConfigField` 注入（当前为 jsonplaceholder 示例地址）。接入真实后端时改这里，或按 debug/staging/release 分环境。
+- **环境切换**：`API_BASE_URL` 由 `app/build.gradle.kts` 的 `buildConfigField` 注入（当前为 jsonplaceholder 示例地址），再由 `app/.../di/AppNetworkModule.kt` 组装成 `HostConfig` 交给 `:base`。接入真实后端时改这里，或按 debug/staging/release 分环境；`:base` 自身不硬编码任何域名。
 - **Debug 变体**：`applicationId` 带 `.debug` 后缀，`versionName` 带 `-debug`。
+- **Application 与 Hilt**：公共初始化在 `:base` 的 `BaseApplication`（`open`，无 Hilt 注解）；Hilt 强制要求 `@HiltAndroidApp` 必须定义在 application 模块（library 中会编译失败 `must be defined in a Gradle android application module`），因此 `:app` 的 `AppApplication : BaseApplication()` 只承接该注解。
 - **首页样例**：请求 `https://jsonplaceholder.typicode.com/posts`，经 Room 缓存回退；图片来自 Picsum。
 
 ## 测试
 
-- 目前仅 **JUnit4** 单元测试（`app/src/test`，含基础 `ApiResult` 用例）。
+- 目前仅 **JUnit4** 单元测试（`base/src/test`，含基础 `ApiResult` / `ApiResponse` 用例）。
 - 新增领域逻辑 / 仓库逻辑时**优先补单元测试**；UI 测试与 androidTest 尚未接入。
 
 ## AI 工作流

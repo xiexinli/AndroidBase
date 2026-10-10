@@ -18,6 +18,11 @@ import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFact
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
+/**
+ * 网络层的 Hilt 绑定。
+ *
+ * 域名与超时规则来自宿主 App 提供的 [HostConfig]（见该类 KDoc），本模块只消费不定义。
+ */
 @Module @InstallIn(SingletonComponent::class)
 object NetworkModule {
 
@@ -34,9 +39,11 @@ object NetworkModule {
     @Provides @Singleton fun commonHeaderInterceptor(deviceInfo: DeviceInfo): CommonHeaderInterceptor =
         CommonHeaderInterceptor(deviceInfo)
 
-    @Provides @Singleton fun dynamicHostInterceptor(): DynamicHostInterceptor = DynamicHostInterceptor(HostConfig.hosts)
+    @Provides @Singleton fun dynamicHostInterceptor(hostConfig: HostConfig): DynamicHostInterceptor =
+        DynamicHostInterceptor(hostConfig.hosts)
 
-    @Provides @Singleton fun timeoutInterceptor(): TimeoutInterceptor = TimeoutInterceptor(HostConfig.timeoutRules)
+    @Provides @Singleton fun timeoutInterceptor(hostConfig: HostConfig): TimeoutInterceptor =
+        TimeoutInterceptor(hostConfig.timeoutRules)
 
     @Provides @Singleton fun client(
         auth: AuthInterceptor,
@@ -57,9 +64,10 @@ object NetworkModule {
         .retryOnConnectionFailure(true)
         .build()
 
-    @Provides @Singleton fun retrofit(client: OkHttpClient, json: Json): Retrofit = Retrofit.Builder()
-        .baseUrl(BuildConfig.API_BASE_URL).client(client)
-        .addConverterFactory(json.asConverterFactory("application/json".toMediaType())).build()
+    @Provides @Singleton fun retrofit(client: OkHttpClient, json: Json, hostConfig: HostConfig): Retrofit =
+        Retrofit.Builder()
+            .baseUrl(hostConfig.defaultBaseUrl).client(client)
+            .addConverterFactory(json.asConverterFactory("application/json".toMediaType())).build()
 
     @Provides @Singleton fun postApi(retrofit: Retrofit): PostApi = retrofit.create(PostApi::class.java)
 }

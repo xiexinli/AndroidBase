@@ -21,7 +21,7 @@
 
 ## 验证升级
 
-优先最小验证：`git diff --check` → `./gradlew :app:compileDebugKotlin` → 定向单元测试 `./gradlew :app:testDebugUnitTest`。静态阅读无法证明运行时行为时，如实说明证据缺口，不要因此升级严重度。
+优先最小验证：`git diff --check` → `./gradlew :app:compileDebugKotlin`（`:base` 改动可改用 `:base:compileDebugKotlin`）→ 定向单元测试 `./gradlew :base:testDebugUnitTest`。静态阅读无法证明运行时行为时，如实说明证据缺口，不要因此升级严重度。
 
 ## 相关资产
 

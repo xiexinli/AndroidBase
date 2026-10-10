@@ -2,7 +2,7 @@
 
     <!-- INTERNET / ACCESS_NETWORK_STATE 由 :base 库清单合并提供，此处无需重复声明。 -->
     <application
-        android:name=".BaseApplication"
+        android:name=".AppApplication"
         android:allowBackup="true"
         android:label="@string/app_name"
         android:supportsRtl="true"

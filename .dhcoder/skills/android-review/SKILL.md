@@ -55,8 +55,8 @@ If the diff touches layered code, read `.dhcoder/rules/architecture.md` before j
 Prefer the smallest check that proves the claim:
 
 - `git diff --check`
-- `./gradlew :app:compileDebugKotlin`
-- targeted unit tests `./gradlew :app:testDebugUnitTest`
+- `./gradlew :app:compileDebugKotlin`（`:base` 改动用 `./gradlew :base:compileDebugKotlin`）
+- targeted unit tests `./gradlew :base:testDebugUnitTest`
 - manual verification notes only when runtime behavior cannot be proven from static reads
 
 If evidence is missing, state the gap instead of upgrading severity.

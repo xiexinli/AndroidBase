@@ -1,6 +1,6 @@
 ---
 name: android-native-dev
-description: Android native development guide tailored for this repository. Covers this project's Kotlin DSL Gradle single-module structure, AGP/Kotlin/SDK versions, pure Jetpack Compose plus Hilt setup, and Android build or verification workflows. Use before AndroidBase Android development or troubleshooting.
+description: Android native development guide tailored for this repository. Covers this project's Kotlin DSL Gradle dual-module structure (`:base` library + `:app` application shell), AGP/Kotlin/SDK versions, pure Jetpack Compose plus Hilt setup, and Android build or verification workflows. Use before AndroidBase Android development or troubleshooting.
 ---
 
 # Android Native Dev
@@ -13,11 +13,11 @@ Read `references/project-facts.md` before applying the generic guidance below.
 
 When generic Android guidance conflicts with repository facts, follow the repository facts.
 
-This repository is a runnable single-module template app:
+This repository is a runnable two-module template:
 
 - It already has a Gradle wrapper and a complete Android project structure.
 - It uses Kotlin DSL Gradle files (`build.gradle.kts`), not Groovy.
-- It is a single-module app (`:app`); there are no extra library modules.
+- It is split into `:base` (`com.android.library`, package `com.development.base` — 全部基础设施与样例) and `:app` (`com.android.application` shell, package `com.development.app`, depends on `:base` via `implementation(project(":base"))`).
 - It has no product flavors, so build against `debug` / `release` directly.
 - It uses pure Jetpack Compose + Material 3 UI (no XML layouts, no dataBinding/viewBinding).
 - Dependency versions live in `gradle/libs.versions.toml` (Version Catalog).
@@ -26,9 +26,9 @@ This repository is a runnable single-module template app:
 
 Use the narrowest command that proves the change:
 
-- Fast compile proof: `./gradlew :app:compileDebugKotlin`
-- Packaging proof: `./gradlew :app:assembleDebug`
-- Unit test proof: `./gradlew :app:testDebugUnitTest`
+- Fast compile proof: `./gradlew :base:compileDebugKotlin`（`:base` 改动）/ `./gradlew :app:compileDebugKotlin`（`:app` 改动）
+- Packaging proof: `./gradlew :app:assembleDebug`（APK）/ `./gradlew :base:assembleDebug`（AAR）
+- Unit test proof: `./gradlew :base:testDebugUnitTest`（测试位于 `:base`）
 - There are no flavors, so the plain `debug` task names are unambiguous
 
 ### 1.2 Project-Specific Gotchas
@@ -45,14 +45,14 @@ Use this snapshot as the default mental model for this repository:
 
 | Area | Repository Fact |
 |------|------------------|
-| Build files | `settings.gradle.kts`, `build.gradle.kts`, `app/build.gradle.kts` |
+| Build files | `settings.gradle.kts`, `build.gradle.kts`, `base/build.gradle.kts`, `app/build.gradle.kts` |
 | Dependency versions | `gradle/libs.versions.toml` (Version Catalog) |
 | AGP | `8.8.2` |
 | Kotlin | `2.1.0` (android + compose + serialization plugins) |
 | KSP / Hilt | `2.1.0-1.0.29` / `2.56.2` |
 | SDK levels | `compileSdk=35`, `targetSdk=35`, `minSdk=24` |
 | JVM toolchain | `17` |
-| Modules | single `:app` |
+| Modules | `:base`（library，`com.development.base`）+ `:app`（application shell，`com.development.app`） |
 | Flavors | none |
 | Build types | `debug`, `release` |
 | UI stack | Kotlin, pure Jetpack Compose + Material 3, Hilt ViewModels |
@@ -700,10 +700,10 @@ See [Testing](references/testing.md) for detailed examples, code patterns, and G
 ```bash
 # Local unit tests (fast, no emulator)
 ./gradlew test                          # all modules
-./gradlew :app:testDebugUnitTest        # app module, debug variant
+./gradlew :base:testDebugUnitTest       # :base library, debug variant
 
 # Single test class
-./gradlew :app:testDebugUnitTest --tests "com.androidbase.feature.home.HomeViewModelTest"
+./gradlew :base:testDebugUnitTest --tests "com.development.base.feature.home.HomeViewModelTest"
 
 # Instrumentation tests (requires device or managed device)
 ./gradlew connectedDebugAndroidTest     # on connected device

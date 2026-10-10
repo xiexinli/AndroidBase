@@ -2,7 +2,9 @@
 
 ## 1. 分层与依赖方向
 
-单模块 Clean Architecture，`app/src/main/java/com/androidbase/` 下四层：
+双模块 Clean Architecture：全部业务与基础设施代码位于 `:base` 库
+（`base/src/main/java/com/development/base/`），`:app` 只作为应用壳
+（`app/src/main/java/com/development/app/`，含 Hilt 入口 `AppApplication`、`MainActivity` 与宿主配置）。`:base` 内分四层：
 
 - `core/`：跨层基础设施（network、database、datastore、ui、worker、common）。
 - `data/`：`remote` DTO、`local` Entity/DAO、`repository` 实现。**仅此层可访问网络与数据库。**
@@ -29,11 +31,12 @@
 - 统一返回 `ApiResult<T>`（成功/错误/异常）。
 - 带业务信封的接口用 `ApiResponse<T>` + `apiEnvelopeCall`；裸数据接口用 `apiCall`。
 - 异常统一由 `NetworkExceptionEngine` 归一化，`ApiResult.Error.bizCode` 携带业务码。
-- 超时/域名规则集中维护在 `core/network/HostConfig.kt`。
+- 超时/域名规则集中维护在 `core/network/HostConfig.kt`（数据类，由宿主 App 提供实例）。
 
 ## 5. 目录与命名
 
-- 包名全小写：`com.androidbase.<层>.<模块>`。
+- 包名全小写：`:base` 为 `com.development.base.<层>.<模块>`，`:app` 为 `com.development.app.<模块>`。
+- `:base` 不得反向依赖 `:app`；宿主需要提供的运行期配置（如域名）由 `:base` 定义数据类、宿主在 Hilt 模块中构造注入。
 - 一个文件一个主要职责；跨层共享的常量放 `core`。
 - 资源命名下划线风格；Compose 中避免硬编码字符串与颜色，优先主题令牌。
 

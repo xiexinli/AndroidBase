@@ -17,6 +17,8 @@ android {
         versionCode = 1
         versionName = "1.0.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        // 默认域名由宿主 App 提供（见 app/src/main/java/com/development/app/di/AppNetworkModule.kt）
+        buildConfigField("String", "API_BASE_URL", "\"https://jsonplaceholder.typicode.com/\"")
     }
 
     buildTypes {
@@ -46,7 +48,6 @@ dependencies {
 
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
-    implementation(libs.timber)
 
     testImplementation(libs.junit)
 }

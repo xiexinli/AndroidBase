@@ -2,6 +2,8 @@
 
 基于 **Kotlin + Jetpack Compose + Clean Architecture + MVVM** 的可运行 Android 基础工程。
 
+采用双模块：**`:base`**（`com.android.library`，包名 `com.development.base`）承载全部基础设施与样例，可被其它业务工程直接依赖；**`:app`**（`com.android.application`，包名 `com.development.app`）是薄应用壳，只放 Hilt 入口（`AppApplication`）、`MainActivity`、资源与宿主配置。
+
 ## 已实现
 
 - **UI / 状态**：Compose、Material 3、`ViewModel + StateFlow + UiState`；首页展示加载、成功、错误和缓存回退状态。
@@ -17,11 +19,16 @@
 ## 目录
 
 ```text
-app/src/main/java/com/androidbase/
+base/src/main/java/com/development/base/     # :base —— 可复用的依赖库
 ├── core/       # network、database、datastore、ui、worker、common
 ├── data/       # remote DTO、local Entity/DAO、Repository 实现
 ├── domain/     # model、Repository 接口、UseCase
 └── feature/    # 页面与 ViewModel
+
+app/src/main/java/com/development/app/       # :app —— 应用壳
+├── AppApplication.kt                        # @HiltAndroidApp，继承 :base 的 BaseApplication
+├── MainActivity.kt
+└── di/AppNetworkModule.kt                   # 向 :base 提供域名等运行期配置
 ```
 
 ## 运行
@@ -32,7 +39,7 @@ app/src/main/java/com/androidbase/
 
 ## 接入真实后端
 
-- 修改 `app/build.gradle.kts` 中的 `API_BASE_URL`，或为 `debug/staging/release` 分别定义。
+- 修改 `app/build.gradle.kts` 中的 `API_BASE_URL`，或为 `debug/staging/release` 分别定义；该值由 `app/src/main/java/com/development/app/di/AppNetworkModule.kt` 组装成 `HostConfig` 注入 `:base`（`:base` 不硬编码域名，多域名与超时规则也在 `HostConfig` 上补充）。
 - 在 `data/remote` 新增 API 与 DTO；在 `data/repository` 实现业务仓库。
 - 登录成功后使用 `UserPreferences.saveAccessToken(token)` 保存令牌；请求会自动携带 `Authorization: Bearer <token>`。
 - 当前刷新 Token 是业务占位：请依据后端协议在 OkHttp `Authenticator` 或专门的 TokenRefreshManager 中实现串行刷新，刷新失败后 `UserPreferences.clear()` 并导航至登录页。
@@ -68,7 +75,7 @@ suspend fun refreshOrders(): ApiResult<List<Order>> = withContext(io) {
 }
 ```
 
-> 多域名/超时规则集中维护在 `core/network/HostConfig.kt`，接入真实后端时改这一个文件即可。
+> 多域名/超时规则集中维护在 `core/network/HostConfig.kt`（数据类），由宿主 App 在自己的 Hilt 模块中构造并提供实例；`:base` 只消费不定义域名。
 
 ## AI 助手配置（`.dhcoder/`）
 
@@ -92,4 +99,4 @@ suspend fun refreshOrders(): ApiResult<List<Order>> = withContext(io) {
 
 ## 后续建议
 
-分页列表引入 Paging 3；业务增长后按 `core/data/domain/feature` 拆为 Gradle 模块，并加入 Detekt/Ktlint、Crashlytics/Sentry、CI 与 UI 测试。
+分页列表引入 Paging 3；`:base` 已按 `core/data/domain/feature` 分层，业务增长后可继续把 `feature/<name>` 拆为独立 Gradle 模块并依赖 `:base`；同时加入 Detekt/Ktlint、Crashlytics/Sentry、CI 与 UI 测试。
