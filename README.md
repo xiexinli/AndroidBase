@@ -2,7 +2,7 @@
 
 基于 **Kotlin + Jetpack Compose + Clean Architecture + MVVM** 的可运行 Android 基础工程。
 
-采用双模块：**`:base`**（`com.android.library`，包名 `com.development.base`）承载全部基础设施与样例，可被其它业务工程直接依赖；**`:app`**（`com.android.application`，包名 `com.development.app`）是薄应用壳，只放 Hilt 入口（`AppApplication`）、`MainActivity`、资源与宿主配置。
+采用三模块：**`:base`**（`com.android.library`，包名 `com.development.base`）承载全部基础设施与样例，可被其它业务工程直接依赖；**`:app`**（`com.android.application`，包名 `com.development.app`）是薄应用壳，只放 Hilt 入口（`AppApplication`）、`MainActivity`、资源与宿主配置；**`:demo`**（`com.android.application`，包名 `com.development.demo`）是只依赖 `:base` 的独立示例应用，用来验证「只依赖 base 即可运行」。
 
 ## 已实现
 
@@ -29,17 +29,22 @@ app/src/main/java/com/development/app/       # :app —— 应用壳
 ├── AppApplication.kt                        # @HiltAndroidApp，继承 :base 的 BaseApplication
 ├── MainActivity.kt
 └── di/AppNetworkModule.kt                   # 向 :base 提供域名等运行期配置
+
+demo/src/main/java/com/development/demo/     # :demo —— 只依赖 :base 的示例应用
+├── DemoApplication.kt                       # @HiltAndroidApp，继承 :base 的 BaseApplication
+├── MainActivity.kt                          # 直接复用 :base 的 AndroidBaseTheme + HomeRoute
+└── di/DemoNetworkModule.kt                  # 向 :base 提供域名等运行期配置
 ```
 
 ## 运行
 
 1. 使用 Android Studio 打开项目根目录；确认 SDK 路径位于 `local.properties`。
-2. 同步 Gradle 后运行 `app` 的 `debug` 变体。
+2. 同步 Gradle 后运行 `app` 或 `demo` 模块的 `debug` 变体（两者都只依赖 `:base`，`demo` 是纯粹的最小示例）。
 3. 首页默认请求 `https://jsonplaceholder.typicode.com/posts`，并通过 Room 缓存结果；图片来自 Picsum。
 
 ## 接入真实后端
 
-- 修改 `app/build.gradle.kts` 中的 `API_BASE_URL`，或为 `debug/staging/release` 分别定义；该值由 `app/src/main/java/com/development/app/di/AppNetworkModule.kt` 组装成 `HostConfig` 注入 `:base`（`:base` 不硬编码域名，多域名与超时规则也在 `HostConfig` 上补充）。
+- 修改宿主模块的 `API_BASE_URL`（`app/build.gradle.kts`、`demo/build.gradle.kts`），或为 `debug/staging/release` 分别定义；该值由各自 `di/AppNetworkModule.kt` / `di/DemoNetworkModule.kt` 组装成 `HostConfig` 注入 `:base`（`:base` 不硬编码域名，多域名与超时规则也在 `HostConfig` 上补充）。
 - 在 `data/remote` 新增 API 与 DTO；在 `data/repository` 实现业务仓库。
 - 登录成功后使用 `UserPreferences.saveAccessToken(token)` 保存令牌；请求会自动携带 `Authorization: Bearer <token>`。
 - 当前刷新 Token 是业务占位：请依据后端协议在 OkHttp `Authenticator` 或专门的 TokenRefreshManager 中实现串行刷新，刷新失败后 `UserPreferences.clear()` 并导航至登录页。

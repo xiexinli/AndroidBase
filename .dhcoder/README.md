@@ -1,7 +1,7 @@
 # AndroidBase AI 配置说明
 
 > 本文档说明 AndroidBase 中 AI 助手配置的**每一个文件**：作用、生效时机、搭配关系与注意事项。
-> 这些配置从 AndroidBuyer 的 `AgentKit/` + `agent/` 抽取，并按本工程（Kotlin DSL 双模块 `:base` + `:app`、纯 Compose、Hilt、kotlinx.serialization、Timber）改写。
+> 这些配置从 AndroidBuyer 的 `AgentKit/` + `agent/` 抽取，并按本工程（Kotlin DSL 三模块 `:base` + `:app` + `:demo`、纯 Compose、Hilt、kotlinx.serialization、Timber）改写。
 
 ## 0. 先读这里：生效模型（重要）
 
@@ -141,7 +141,7 @@
 
 | 文件 | 1. 作用 | 2. 生效时机 | 3. 搭配 | 4. 其他 |
 |---|---|---|---|---|
-| `android-native-dev/SKILL.md` | 本工程的 Android 开发总纲：仓库事实、默认验证路径、Kotlin/Compose 规范、资源命名、构建报错速查、Material 3、测试分层 | Android 开发、功能实现、重构、构建排障 | 必须先读 `references/project-facts.md`；引用其 10 个 references | 已改写：Kotlin DSL、双模块（`:base` + `:app`）、无 flavor、纯 Compose、kotlinx.serialization、Timber |
+| `android-native-dev/SKILL.md` | 本工程的 Android 开发总纲：仓库事实、默认验证路径、Kotlin/Compose 规范、资源命名、构建报错速查、Material 3、测试分层 | Android 开发、功能实现、重构、构建排障 | 必须先读 `references/project-facts.md`；引用其 10 个 references | 已改写：Kotlin DSL、三模块（`:base` + `:app` + `:demo`）、无 flavor、纯 Compose、kotlinx.serialization、Timber |
 | `android-native-dev/references/project-facts.md` | **本工程的仓库事实**（build 形态、版本、架构分层、约定、验证命令、坑） | 用 `android-native-dev` 时最先读 | 被 SKILL.md 第 1 节强制引用 | 事实与通用建议冲突时以本文件为准 |
 | `android-native-dev/references/visual-design.md` | M3 颜色/字体/间距/高度/形状详细规格 | 设计/评审 UI 时 | 被 SKILL.md §7 引用 | 通用 Android 最佳实践 |
 | `android-native-dev/references/motion-system.md` | M3 动画与过渡规格 | 做动效时 | 同上 | — |

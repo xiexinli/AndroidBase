@@ -1,0 +1,7 @@
+<resources>
+    <!-- demo 自己的宿主主题（:base 不提供 XML 主题，只提供 Compose 的 AndroidBaseTheme）。 -->
+    <style name="Theme.Demo" parent="android:style/Theme.Material.Light.NoActionBar">
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+    </style>
+</resources>

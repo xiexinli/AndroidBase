@@ -9,6 +9,7 @@ Read this file first when using `android-native-dev` in this repository.
   - `build.gradle.kts`
   - `base/build.gradle.kts`（`:base` library）
   - `app/build.gradle.kts`（`:app` application shell）
+  - `demo/build.gradle.kts`（`:demo` application shell，仅依赖 `:base`）
 - Gradle wrapper is already present in the repository.
 - This is a runnable template project, not an empty scaffold: a working Compose + Hilt + Retrofit + Room + Coil + WorkManager sample is already wired end to end.
 
@@ -21,10 +22,11 @@ AndroidBase/
 ├── gradle.properties
 ├── gradle/libs.versions.toml   # 依赖版本的唯一事实源（Version Catalog）
 ├── base/                       # com.android.library，包名 com.development.base —— 可复用依赖库
-└── app/                        # com.android.application，包名 com.development.app —— 应用壳
+├── app/                        # com.android.application，包名 com.development.app —— 应用壳
+└── demo/                       # com.android.application，包名 com.development.demo —— 只依赖 :base 的示例应用
 ```
 
-Two modules: `:base`（library，承载 core/data/domain/feature 与全部依赖，含 `open class BaseApplication` 承担 Timber 等公共初始化）和 `:app`（application，只放 `AppApplication`（`@HiltAndroidApp`，继承 `:base` 的 `BaseApplication`）、`MainActivity`、res 与宿主 Hilt 配置，通过 `implementation(project(":base"))` 依赖 `:base`）。Hilt 强制要求 `@HiltAndroidApp` 必须位于 application 模块，无法下沉到 library。Do not invent extra Gradle modules unless the user explicitly asks.
+Three modules: `:base`（library，承载 core/data/domain/feature 与全部依赖，含 `open class BaseApplication` 承担 Timber 等公共初始化）、`:app` 与 `:demo`（两个 application 壳，只放 `*Application`（`@HiltAndroidApp`，继承 `:base` 的 `BaseApplication`）、`MainActivity`、res 与宿主 Hilt 配置，均通过 `implementation(project(":base"))` 依赖 `:base`，彼此不互相依赖）。Hilt 强制要求 `@HiltAndroidApp` 必须位于 application 模块，无法下沉到 library。Do not invent extra Gradle modules unless the user explicitly asks.
 
 ## Toolchain Snapshot
 
@@ -52,7 +54,7 @@ All versions live in `gradle/libs.versions.toml`. **Never** hardcode a dependenc
 - No product flavors.
 - Build types: `debug`, `release`.
 - `debug` adds `applicationIdSuffix = ".debug"` and `versionNameSuffix = "-debug"`.
-- `API_BASE_URL` is injected via `buildConfigField` in `app/build.gradle.kts`, then assembled into `HostConfig` by `app/src/main/java/com/development/app/di/AppNetworkModule.kt` and provided to `:base`。`:base` 不硬编码任何域名。
+- `API_BASE_URL` is injected via `buildConfigField` in `app/build.gradle.kts` / `demo/build.gradle.kts`, then assembled into `HostConfig` by the host's `di/AppNetworkModule.kt` / `di/DemoNetworkModule.kt` and provided to `:base`。`:base` 不硬编码任何域名。
 - `buildFeatures { compose = true; buildConfig = true }`.
 
 ## UI Stack
@@ -73,7 +75,7 @@ com/development/base/
 └── feature/  # 页面 Screen 与 ViewModel（按业务 feature 分包）
 ```
 
-`:app` 只保留应用壳（`app/src/main/java/com/development/app/`：`AppApplication`、`MainActivity`、`di/AppNetworkModule`）；公共 `Application` 初始化在 `:base` 的 `BaseApplication`（`open`，无 Hilt 注解）。
+`:app` 与 `:demo` 只保留应用壳（`app/src/main/java/com/development/app/`：`AppApplication`、`MainActivity`、`di/AppNetworkModule`；`demo/src/main/java/com/development/demo/`：`DemoApplication`、`MainActivity`、`di/DemoNetworkModule`）；公共 `Application` 初始化在 `:base` 的 `BaseApplication`（`open`，无 Hilt 注解）。`demo` 是最小示例：不新增业务代码，直接复用 `:base` 的 `AndroidBaseTheme` 与 `HomeRoute`。
 
 Dependency direction: `feature → domain ← data`; `feature`/`data` may depend on `core`; `domain` must not depend on any Android framework.
 
@@ -98,19 +100,21 @@ Use the narrowest proof for the change:
 git diff --check -- <touched files...>
 ./gradlew :base:compileDebugKotlin      # :base 代码改动
 ./gradlew :app:compileDebugKotlin       # :app 壳改动
+./gradlew :demo:compileDebugKotlin      # :demo 壳改动
 ```
 
 Use broader proof only when needed:
 
 ```bash
-./gradlew :app:assembleDebug            # 打包 APK（含 :base）
+./gradlew :app:assembleDebug            # 打包 :app 的 APK（含 :base）
+./gradlew :demo:assembleDebug           # 打包 :demo 的 APK（含 :base）
 ./gradlew :base:assembleDebug           # 单独产出 :base 的 AAR
 ./gradlew :base:testDebugUnitTest       # 单元测试位于 :base
 ```
 
 ## Repository-Specific Gotchas
 
-- There are no flavors here, so `compileDebugKotlin` / `assembleDebug` / `testDebugUnitTest` are unambiguous — prefix them with the module (`:base:` or `:app:`). Unit tests live in `:base`.
+- There are no flavors here, so `compileDebugKotlin` / `assembleDebug` / `testDebugUnitTest` are unambiguous — prefix them with the module (`:base:`, `:app:` or `:demo:`). Unit tests live in `:base`.
 - `assemble*` needs a valid Android SDK path in `local.properties` (not committed).
 - Dependency resolution errors usually mean a missing/incorrect entry in `gradle/libs.versions.toml`, not a build-script typo.
 - Adding a dependency requires editing the Version Catalog and the `dependencies { }` block — both.

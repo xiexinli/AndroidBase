@@ -6,7 +6,7 @@
 ## 语言与构建
 
 - Kotlin **2.1.0**，AGP **8.8.2**，KSP **2.1.0-1.0.29**。
-- Gradle **Kotlin DSL**（`build.gradle.kts` / `settings.gradle.kts`），双模块：`:base`（`com.android.library`，包名 `com.development.base`）+ `:app`（`com.android.application` 应用壳，包名 `com.development.app`，依赖 `:base`）。
+- Gradle **Kotlin DSL**（`build.gradle.kts` / `settings.gradle.kts`），三模块：`:base`（`com.android.library`，包名 `com.development.base`）+ `:app`（`com.android.application` 应用壳，包名 `com.development.app`，依赖 `:base`）+ `:demo`（`com.android.application` 示例应用，包名 `com.development.demo`，只依赖 `:base`）。
 - `compileSdk 35` / `targetSdk 35` / `minSdk 24`，JVM toolchain **17**。
 - 依赖版本集中在 `gradle/libs.versions.toml`，**禁止**在 `build.gradle.kts` 写裸版本号。
 

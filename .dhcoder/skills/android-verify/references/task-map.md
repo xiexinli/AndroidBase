@@ -2,7 +2,7 @@
 
 ## Default Variant
 
-This repository has **no product flavors**. It has two modules — `:base` (`com.android.library`, package `com.development.base`) and `:app` (`com.android.application` shell, package `com.development.app`) — and the build types are `debug` / `release`.
+This repository has **no product flavors**. It has three modules — `:base` (`com.android.library`, package `com.development.base`), `:app` (application shell, package `com.development.app`) and `:demo` (application shell, package `com.development.demo`, depends only on `:base`) — and the build types are `debug` / `release`.
 
 So the plain `debug` task names are unambiguous — prefix them with the module you touched:
 
@@ -10,6 +10,7 @@ So the plain `debug` task names are unambiguous — prefix them with the module 
 |--------|-------|
 | `:base` | `:base:compileDebugKotlin`, `:base:assembleDebug`（AAR）, `:base:testDebugUnitTest` |
 | `:app` | `:app:compileDebugKotlin`, `:app:assembleDebug`（APK）, `:app:testDebugUnitTest` |
+| `:demo` | `:demo:compileDebugKotlin`, `:demo:assembleDebug`（APK）, `:demo:testDebugUnitTest` |
 
 Unit tests live in `:base` (`base/src/test/java/com/development/base/`).
 
@@ -44,20 +45,21 @@ Notes:
 - This is the default compile proof for `:base` changes.
 - It is fast and does not run lint or packaging.
 
-### App shell change (`:app`)
+### App shell change (`:app` / `:demo`)
 
 ```bash
 ./gradlew :app:compileDebugKotlin
+./gradlew :demo:compileDebugKotlin
 ```
 
 Use for:
 
-- Kotlin changes in `app/src/main/java`（`AppApplication`、`MainActivity`、`di/AppNetworkModule`）
-- manifest / resource changes under `app/src/main/`
+- Kotlin changes in `app/src/main/java`（`AppApplication`、`MainActivity`、`di/AppNetworkModule`）or `demo/src/main/java`（`DemoApplication`、`MainActivity`、`di/DemoNetworkModule`）
+- manifest / resource changes under `app/src/main/` or `demo/src/main/`
 
 Notes:
 
-- A `:app` change almost always pulls in `:base` compilation as well.
+- A shell change almost always pulls in `:base` compilation as well.
 
 ### Unit tests
 
@@ -73,7 +75,8 @@ Use for:
 ### Broader packaging proof
 
 ```bash
-./gradlew :app:assembleDebug      # APK（含 :base）
+./gradlew :app:assembleDebug      # :app 的 APK（含 :base）
+./gradlew :demo:assembleDebug     # :demo 的 APK（含 :base）
 ./gradlew :base:assembleDebug     # :base 的 AAR
 ```
 
