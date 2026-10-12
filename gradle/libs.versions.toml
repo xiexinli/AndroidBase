@@ -18,6 +18,7 @@ room = "2.6.1"
 datastore = "1.1.2"
 work = "2.10.0"
 hiltWork = "1.2.0"
+window = "1.5.1"
 timber = "5.0.1"
 junit = "4.13.2"
 
@@ -49,6 +50,8 @@ androidx-datastore-preferences = { module = "androidx.datastore:datastore-prefer
 androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "work" }
 androidx-hilt-work = { module = "androidx.hilt:hilt-work", version.ref = "hiltWork" }
 androidx-hilt-compiler = { module = "androidx.hilt:hilt-compiler", version.ref = "hiltWork" }
+androidx-window = { module = "androidx.window:window", version.ref = "window" }
+androidx-window-core = { module = "androidx.window:window-core", version.ref = "window" }
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
 junit = { module = "junit:junit", version.ref = "junit" }
 

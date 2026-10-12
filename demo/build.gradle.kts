@@ -40,6 +40,7 @@ dependencies {
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.ui)
@@ -48,6 +49,10 @@ dependencies {
 
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
+    // 折叠屏自适应示例用到的能力（均为 :base 未向上暴露的依赖，故本模块显式声明）。
+    implementation(libs.androidx.hilt.navigation.compose)
+    implementation(libs.androidx.window)
+    implementation(libs.androidx.window.core)
 
     testImplementation(libs.junit)
 }
