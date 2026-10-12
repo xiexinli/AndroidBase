@@ -20,7 +20,7 @@
 ## 项目概览
 
 基于 **Kotlin + Jetpack Compose + Clean Architecture + MVVM** 的可运行 Android 基础工程。
-三模块：`:base` 是可被复用的依赖库（基础设施 + 全链路样例），`:app` 是薄的应用壳（只放 Application / Activity / 资源），`:demo` 是只依赖 `:base` 的独立示例应用。
+三模块：`:base` 是可复用公共能力库（core/data/domain 等，不放具体页面 UI），`:app` 承载主应用页面、导航与页面状态，`:demo` 是只依赖 `:base` 的独立示例应用并由自身承载演示 UI。
 定位为新业务项目的起点模板：已打通 UI / 状态 / DI / 网络 / 缓存 / 后台任务的全链路样例。
 
 ## 技术栈（版本以 `gradle/libs.versions.toml` 为唯一事实源）
@@ -43,10 +43,9 @@ AndroidBase/
 │   └── src/main/java/com/development/base/
 │       ├── core/       # network、database、datastore、ui、worker、common（跨层基础设施）
 │       ├── data/       # remote DTO、local Entity/DAO、Repository 实现（仅此层可访问网络/数据库）
-│       ├── domain/     # model、Repository 接口、UseCase（纯 Kotlin，不依赖 Android 框架）
-│       └── feature/    # 页面 Screen 与 ViewModel（按业务 feature 分包，如 home）
-├── app/                        # com.android.application，包名 com.development.app —— 应用壳
-│   └── src/main/java/com/development/app/   # AppApplication、MainActivity、di/AppNetworkModule
+│       └── domain/     # model、Repository 接口、UseCase（纯 Kotlin，不依赖 Android 框架）
+├── app/                        # com.android.application，包名 com.development.app —— 主应用与 UI
+│   └── src/main/java/com/development/app/   # AppApplication、MainActivity、feature/*、di/AppNetworkModule
 └── demo/                       # com.android.application，包名 com.development.demo —— 只依赖 :base 的示例应用
     └── src/main/java/com/development/demo/  # DemoApplication、MainActivity、di/DemoNetworkModule
 ```
@@ -70,8 +69,8 @@ AndroidBase/
 
 ## 架构约束（新增代码必须遵守）
 
-1. **依赖方向**：`feature → domain ← data`；`feature`/`data` 可依赖 `core`；`domain` 不依赖任何 Android 框架。
-2. **UI 状态**：ViewModel 持有不可变 `UiState`（`StateFlow`），UI 侧用 `collectAsStateWithLifecycle` 收集；禁止 UI 直接持有可变状态。
+1. **依赖方向**：`:app`/`:demo` 的页面层 → `:base` domain；`:base` 内为 `data → domain`，data 可依赖 core；domain 不依赖任何 Android 框架。具体 Screen、导航、页面 ViewModel/UI state 只能放在宿主模块，`:base` 不包含 feature 页面。
+2. **UI 状态**：页面 ViewModel 由宿主模块持有不可变 `UiState`（`StateFlow`），UI 侧用 `collectAsStateWithLifecycle` 收集；`:base` 只提供可复用的通用状态与能力。
 3. **网络统一封装**：接口返回统一 `ApiResult<T>`（成功/错误/异常）；Repository 层负责 `remote → Room 缓存 → domain model`，网络失败时回退本地缓存。
 4. **依赖注入**：一律用 Hilt。ViewModel 用 `@HiltViewModel`，Worker 用 `@HiltWorker`，模块用 `@Module`/`@InstallIn`。
 5. **图片**：统一走 `core/ui/AppImage`（封装 Coil），不在业务层直接写 `AsyncImage`。

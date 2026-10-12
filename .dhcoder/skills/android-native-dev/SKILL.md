@@ -17,7 +17,7 @@ This repository is a runnable three-module template:
 
 - It already has a Gradle wrapper and a complete Android project structure.
 - It uses Kotlin DSL Gradle files (`build.gradle.kts`), not Groovy.
-- It is split into `:base` (`com.android.library`, package `com.development.base` — 全部基础设施与样例), `:app` (`com.android.application` shell, package `com.development.app`) and `:demo` (`com.android.application` shell, package `com.development.demo`); both shells depend on `:base` via `implementation(project(":base"))` and do not depend on each other. `:demo` is the minimal example — it reuses `:base`'s `AndroidBaseTheme` + `HomeRoute` and adds no business code.
+- It is split into `:base` (`com.android.library`, package `com.development.base` — reusable infrastructure/data/domain/public capabilities), `:app` (`com.android.application`, package `com.development.app`, owns main application UI), and `:demo` (`com.android.application`, package `com.development.demo`, owns demo UI); both apps depend on `:base` and do not depend on each other. App-specific screens, navigation, and page ViewModels belong in their owning application; `:base` may expose reusable theme/image components but has no concrete pages.
 - It has no product flavors, so build against `debug` / `release` directly.
 - It uses pure Jetpack Compose + Material 3 UI (no XML layouts, no dataBinding/viewBinding).
 - Dependency versions live in `gradle/libs.versions.toml` (Version Catalog).
@@ -52,7 +52,7 @@ Use this snapshot as the default mental model for this repository:
 | KSP / Hilt | `2.1.0-1.0.29` / `2.56.2` |
 | SDK levels | `compileSdk=35`, `targetSdk=35`, `minSdk=24` |
 | JVM toolchain | `17` |
-| Modules | `:base`（library，`com.development.base`）+ `:app`（shell，`com.development.app`）+ `:demo`（shell，`com.development.demo`）；两个 shell 各自依赖 `:base` |
+| Modules | `:base`（library，`com.development.base`，提供公共能力）+ `:app`（application，`com.development.app`，承载主应用 UI）+ `:demo`（application，`com.development.demo`，承载演示 UI）；两个 app 各自依赖 `:base` |
 | Flavors | none |
 | Build types | `debug`, `release` |
 | UI stack | Kotlin, pure Jetpack Compose + Material 3, Hilt ViewModels |
@@ -703,7 +703,7 @@ See [Testing](references/testing.md) for detailed examples, code patterns, and G
 ./gradlew :base:testDebugUnitTest       # :base library, debug variant
 
 # Single test class
-./gradlew :base:testDebugUnitTest --tests "com.development.base.feature.home.HomeViewModelTest"
+./gradlew :app:testDebugUnitTest --tests "com.development.app.feature.home.HomeViewModelPaginationTest"
 
 # Instrumentation tests (requires device or managed device)
 ./gradlew connectedDebugAndroidTest     # on connected device

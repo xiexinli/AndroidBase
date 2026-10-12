@@ -2,21 +2,17 @@
 
 ## 1. 分层与依赖方向
 
-三模块 Clean Architecture：全部业务与基础设施代码位于 `:base` 库
-（`base/src/main/java/com/development/base/`），`:app` 与 `:demo` 只作为应用壳
-（分别 `app/src/main/java/com/development/app/`、`demo/src/main/java/com/development/demo/`，
-含 Hilt 入口 `*Application`、`MainActivity` 与宿主配置），二者互不依赖、都只依赖 `:base`。`:base` 内分四层：
+三模块 Clean Architecture：可复用基础设施、数据和领域代码位于 `:base`（`base/src/main/java/com/development/base/`）；主应用 UI 位于 `:app`（`app/src/main/java/com/development/app/`），`:demo` 的演示 UI 位于 `demo/src/main/java/com/development/demo/`。`:app` 与 `:demo` 互不依赖，均只依赖 `:base`。`:base` 内分三类：
 
 - `core/`：跨层基础设施（network、database、datastore、ui、worker、common）。
 - `data/`：`remote` DTO、`local` Entity/DAO、`repository` 实现。**仅此层可访问网络与数据库。**
 - `domain/`：`model`、`repository` 接口、`usecase`。**纯 Kotlin，不依赖任何 Android 框架。**
-- `feature/`：按业务分包（如 `home`），含 Compose Screen 与 ViewModel。
 
-依赖方向：`feature → domain ← data`；`feature`/`data` 可依赖 `core`。**禁止** `domain` 反向依赖上层或 Android 框架。
+宿主页面层依赖 `:base` 的 domain/usecase；`:base` 内为 `data → domain`，data 可依赖 core。**禁止** domain 反向依赖上层或 Android 框架。具体 Compose Screen、导航图、页面 ViewModel 和页面 UI state 必须位于宿主模块；`:base/core/ui` 可提供主题、图片等通用 UI 能力。
 
 ## 2. 新增功能规范
 
-- 新页面：在 `feature/<name>/` 下新增 `XxxScreen.kt` 与 `XxxViewModel.kt`。
+- 主应用新页面：在 `app/src/main/java/com/development/app/feature/<name>/` 下新增 `XxxScreen.kt` 与 `XxxViewModel.kt`；demo 页面只放在 `demo`。
 - ViewModel 必须 `@HiltViewModel`，构造注入 UseCase/Repository。
 - 数据获取走 `domain/usecase`，不在 ViewModel 里直接调 Retrofit 或 DAO。
 - 需要在 `domain/repository` 定义接口，在 `data/repository` 实现，并通过 Hilt `@Binds` 绑定。

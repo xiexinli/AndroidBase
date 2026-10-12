@@ -2,7 +2,7 @@
 
 基于 **Kotlin + Jetpack Compose + Clean Architecture + MVVM** 的可运行 Android 基础工程。
 
-采用三模块：**`:base`**（`com.android.library`，包名 `com.development.base`）承载全部基础设施与样例，可被其它业务工程直接依赖；**`:app`**（`com.android.application`，包名 `com.development.app`）是薄应用壳，只放 Hilt 入口（`AppApplication`）、`MainActivity`、资源与宿主配置；**`:demo`**（`com.android.application`，包名 `com.development.demo`）是只依赖 `:base` 的独立示例应用，用来验证「只依赖 base 即可运行」。
+采用三模块：**`:base`**（`com.android.library`，包名 `com.development.base`）承载可复用公共能力、基础设施、数据与领域层，可被其它业务工程直接依赖；**`:app`**（`com.android.application`，包名 `com.development.app`）承载主应用 UI、导航和页面状态以及 Hilt 入口与宿主配置；**`:demo`**（`com.android.application`，包名 `com.development.demo`）是只依赖 `:base` 的独立示例应用，独立承载折叠屏演示 UI，用来验证「只依赖 base 即可运行」。
 
 ## 已实现
 
@@ -19,21 +19,22 @@
 ## 目录
 
 ```text
-base/src/main/java/com/development/base/     # :base —— 可复用的依赖库
+base/src/main/java/com/development/base/     # :base —— 公共能力库
 ├── core/       # network、database、datastore、ui、worker、common
 ├── data/       # remote DTO、local Entity/DAO、Repository 实现
-├── domain/     # model、Repository 接口、UseCase
-└── feature/    # 页面与 ViewModel
+└── domain/     # model、Repository 接口、UseCase
 
-app/src/main/java/com/development/app/       # :app —— 应用壳
+app/src/main/java/com/development/app/       # :app —— 主应用与 UI
 ├── AppApplication.kt                        # @HiltAndroidApp，继承 :base 的 BaseApplication
 ├── MainActivity.kt
-└── di/AppNetworkModule.kt                   # 向 :base 提供域名等运行期配置
+├── feature/                                  # 页面、导航与页面 ViewModel
+└── di/AppNetworkModule.kt                    # 向 :base 提供域名等运行期配置
 
-demo/src/main/java/com/development/demo/     # :demo —— 只依赖 :base 的示例应用
+demo/src/main/java/com/development/demo/     # :demo —— 独立折叠屏演示 UI
 ├── DemoApplication.kt                       # @HiltAndroidApp，继承 :base 的 BaseApplication
-├── MainActivity.kt                          # 直接复用 :base 的 AndroidBaseTheme + HomeRoute
-└── di/DemoNetworkModule.kt                  # 向 :base 提供域名等运行期配置
+├── MainActivity.kt
+├── adaptive/                                 # demo 自己的 UI 与页面状态
+└── di/DemoNetworkModule.kt                   # 向 :base 提供域名等运行期配置
 ```
 
 ## 运行
@@ -63,7 +64,7 @@ demo/src/main/java/com/development/demo/     # :demo —— 只依赖 :base 的�
 | 动态域名 | `interceptor/DynamicHostInterceptor.kt` + `HostConfig.kt` | 接口写 `@Headers("url:key")` 即切换域名 |
 | 超时定制 | `interceptor/TimeoutInterceptor.kt` + `HostConfig.kt` | 按 URL 片段覆盖默认超时 |
 | 网络状态 | `NetworkMonitor.kt` | `isConnected()`/`isWifi()`/`networkTypeName()` 同步查询，`isOnline` Flow 监听变化 |
-| 页面状态 | `core/common/UiState.kt` | 通用 `Idle/Loading/Success/Error` |
+| 通用状态 | `core/common/UiState.kt` | 可复用 `Idle/Loading/Success/Error`；具体页面状态由宿主模块持有 |
 
 典型用法：
 
@@ -104,4 +105,4 @@ suspend fun refreshOrders(): ApiResult<List<Order>> = withContext(io) {
 
 ## 后续建议
 
-分页列表引入 Paging 3；`:base` 已按 `core/data/domain/feature` 分层，业务增长后可继续把 `feature/<name>` 拆为独立 Gradle 模块并依赖 `:base`；同时加入 Detekt/Ktlint、Crashlytics/Sentry、CI 与 UI 测试。
+分页列表引入 Paging 3；`:base` 已按 `core/data/domain` 分层；宿主应用分别维护自己的 UI，业务增长后可继续把 `feature/<name>` 拆为独立 Gradle 模块并依赖 `:base`；同时加入 Detekt/Ktlint、Crashlytics/Sentry、CI 与 UI 测试。

@@ -32,8 +32,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.window.core.layout.WindowSizeClass
 import androidx.window.layout.FoldingFeature
-import com.development.base.feature.home.HomeUiState
-import com.development.base.feature.home.HomeViewModel
 
 /** 「未选中任何条目」的哨兵值；用 -1 而不是可空状态，便于 `rememberSaveable` 保存。 */
 private const val NoSelection = -1
@@ -45,7 +43,7 @@ private const val NoSelection = -1
  * 这里只演示布局如何随窗口尺寸与折叠姿态变化。
  */
 @Composable
-fun AdaptiveDemoRoute(viewModel: HomeViewModel = hiltViewModel()) {
+fun AdaptiveDemoRoute(viewModel: DemoPostsViewModel = hiltViewModel()) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     AdaptiveDemoScreen(
         state = state,
@@ -58,7 +56,7 @@ fun AdaptiveDemoRoute(viewModel: HomeViewModel = hiltViewModel()) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun AdaptiveDemoScreen(
-    state: HomeUiState,
+    state: DemoPostsUiState,
     windowSizeClass: WindowSizeClass,
     foldingFeature: FoldingFeature?,
     onRefresh: () -> Unit,
@@ -107,7 +105,7 @@ private fun AdaptiveDemoScreen(
 /** 单栏：列表与详情分开导航，适合紧凑窗口。 */
 @Composable
 private fun CompactLayout(
-    state: HomeUiState,
+    state: DemoPostsUiState,
     selectedId: Int,
     onSelect: (Int) -> Unit,
     onBack: () -> Unit,
@@ -124,7 +122,7 @@ private fun CompactLayout(
 /** 双栏：中等及以上窗口把列表与详情并排；书本模式下在中间留出铰链宽度。 */
 @Composable
 private fun TwoPaneLayout(
-    state: HomeUiState,
+    state: DemoPostsUiState,
     selectedId: Int,
     hingeSpacing: Dp,
     onSelect: (Int) -> Unit,
@@ -141,7 +139,7 @@ private fun TwoPaneLayout(
 /** 桌面模式：内容放在上半屏，列表与操作放到下半屏，避开水平方向的折痕。 */
 @Composable
 private fun TabletopLayout(
-    state: HomeUiState,
+    state: DemoPostsUiState,
     selectedId: Int,
     hingeSpacing: Dp,
     onSelect: (Int) -> Unit,
@@ -208,7 +206,7 @@ private fun AdaptiveStatusBanner(
 
 /** 与 `:base` 样例页一致的加载 / 异常提示。 */
 @Composable
-private fun DataStatusLine(state: HomeUiState) {
+private fun DataStatusLine(state: DemoPostsUiState) {
     val error = state.error
     when {
         error != null -> Text(

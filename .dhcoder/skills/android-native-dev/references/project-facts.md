@@ -26,7 +26,7 @@ AndroidBase/
 └── demo/                       # com.android.application，包名 com.development.demo —— 只依赖 :base 的示例应用
 ```
 
-Three modules: `:base`（library，承载 core/data/domain/feature 与全部依赖，含 `open class BaseApplication` 承担 Timber 等公共初始化）、`:app` 与 `:demo`（两个 application 壳，只放 `*Application`（`@HiltAndroidApp`，继承 `:base` 的 `BaseApplication`）、`MainActivity`、res 与宿主 Hilt 配置，均通过 `implementation(project(":base"))` 依赖 `:base`，彼此不互相依赖）。Hilt 强制要求 `@HiltAndroidApp` 必须位于 application 模块，无法下沉到 library。Do not invent extra Gradle modules unless the user explicitly asks.
+Three modules: `:base`（library，承载 core/data/domain 公共能力，含 `open class BaseApplication` 承担 Timber 等公共初始化）、`:app` 与 `:demo`（两个 application，各自承载自己的页面 UI；`*Application`（`@HiltAndroidApp`）继承 `:base` 的 `BaseApplication`，并含 `MainActivity`、res 与宿主 Hilt 配置，均通过 `implementation(project(":base"))` 依赖 `:base`，彼此不互相依赖）。Hilt 强制要求 `@HiltAndroidApp` 必须位于 application 模块，无法下沉到 library。Do not invent extra Gradle modules unless the user explicitly asks.
 
 ## Toolchain Snapshot
 
@@ -65,19 +65,18 @@ All versions live in `gradle/libs.versions.toml`. **Never** hardcode a dependenc
 
 ## Architecture
 
-Clean Architecture lives in the `:base` library — four layers under `base/src/main/java/com/development/base/`:
+公共 Clean Architecture 能力 lives in the `:base` library under `base/src/main/java/com/development/base/`:
 
 ```
 com/development/base/
 ├── core/     # network、database、datastore、ui、worker、common（跨层基础设施）
 ├── data/     # remote DTO、local Entity/DAO、Repository 实现（仅此层可访问网络/数据库）
-├── domain/   # model、Repository 接口、UseCase（纯 Kotlin，不依赖 Android 框架）
-└── feature/  # 页面 Screen 与 ViewModel（按业务 feature 分包）
+└── domain/   # model、Repository 接口、UseCase（纯 Kotlin，不依赖 Android 框架）
 ```
 
-`:app` 与 `:demo` 只保留应用壳（`app/src/main/java/com/development/app/`：`AppApplication`、`MainActivity`、`di/AppNetworkModule`；`demo/src/main/java/com/development/demo/`：`DemoApplication`、`MainActivity`、`di/DemoNetworkModule`）；公共 `Application` 初始化在 `:base` 的 `BaseApplication`（`open`，无 Hilt 注解）。`demo` 是最小示例：不新增业务代码，直接复用 `:base` 的 `AndroidBaseTheme` 与 `HomeRoute`。
+`:app` 和 `:demo` 各自拥有应用 UI（包括 Screen、导航和页面 ViewModel），且不互相依赖；公共 `Application` 初始化在 `:base` 的 `BaseApplication`（`open`，无 Hilt 注解）。`:base/core/ui` 可向宿主提供 `AndroidBaseTheme`、`AppImage` 等共享 UI 能力，但不包含具体页面。
 
-Dependency direction: `feature → domain ← data`; `feature`/`data` may depend on `core`; `domain` must not depend on any Android framework.
+Dependency direction: app/demo presentation depends on `:base` domain/use cases; inside `:base`, data depends on domain and may depend on core; domain must not depend on Android framework. Concrete screens, navigation, page ViewModels, and page UI state must stay in their owning app. `:base/core/ui` may expose reusable theme/image components.
 
 ## Non-Negotiable Conventions
 
@@ -114,7 +113,7 @@ Use broader proof only when needed:
 
 ## Repository-Specific Gotchas
 
-- There are no flavors here, so `compileDebugKotlin` / `assembleDebug` / `testDebugUnitTest` are unambiguous — prefix them with the module (`:base:`, `:app:` or `:demo:`). Unit tests live in `:base`.
+- There are no flavors here, so `compileDebugKotlin` / `assembleDebug` / `testDebugUnitTest` are unambiguous — prefix them with the module (`:base:`, `:app:` or `:demo:`). Core/data/domain unit tests live in `:base`; app presentation tests live in `:app` and demo presentation tests in `:demo`.
 - `assemble*` needs a valid Android SDK path in `local.properties` (not committed).
 - Dependency resolution errors usually mean a missing/incorrect entry in `gradle/libs.versions.toml`, not a build-script typo.
 - Adding a dependency requires editing the Version Catalog and the `dependencies { }` block — both.
