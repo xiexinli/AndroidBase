@@ -52,6 +52,8 @@ dependencies {
 
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
+    // 页面层日志统一走 Timber（:base 的 BaseApplication 已初始化）。
+    implementation(libs.timber)
 
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)

@@ -5,6 +5,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -14,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -27,6 +29,11 @@ import com.development.app.feature.home.HomeRoute
 import com.development.app.feature.home.PostDetailDestination
 import com.development.app.feature.home.PostDetailRoute
 import com.development.app.feature.im.ImRoute
+import com.development.app.feature.webview.WebViewActivity
+import com.development.app.feature.webview.WebViewDisplayMode
+
+/** 首页悬浮按钮打开的 H5 地址（示例）。 */
+private const val HomeWebViewUrl = "https://www.baidu.com"
 
 /** 底部导航的顶层页面。 */
 private enum class MainTab(val route: String, val label: String, val icon: ImageVector) {
@@ -39,15 +46,35 @@ private enum class MainTab(val route: String, val label: String, val icon: Image
  * 应用主页：底部三个 Tab（Home / IM / Account）加页面栈。
  *
  * Tab 之间切换用 `saveState` / `restoreState` 保留各自的状态（如列表滚动位置）；
- * 进入详情页等非顶层页面时隐藏底部导航栏。
+ * 进入详情页、WebView 等非顶层页面时隐藏底部导航栏与悬浮按钮。
  */
 @Composable
 fun MainRoute() {
     val navController = rememberNavController()
+    val context = LocalContext.current
     val backStackEntry by navController.currentBackStackEntryAsState()
     val selectedTab = MainTab.entries.firstOrNull { it.route == backStackEntry?.destination?.route }
 
-    Scaffold(bottomBar = { selectedTab?.let { MainBottomBar(it) { tab -> navController.switchTab(tab) } } }) { padding ->
+    Scaffold(
+        bottomBar = { selectedTab?.let { MainBottomBar(it) { tab -> navController.switchTab(tab) } } },
+        floatingActionButton = {
+            if (selectedTab == MainTab.Home) {
+                FloatingActionButton(
+                    onClick = {
+                        context.startActivity(
+                            WebViewActivity.createIntent(
+                                context = context,
+                                url = HomeWebViewUrl,
+                                displayMode = WebViewDisplayMode.DIALOG
+                            )
+                        )
+                    }
+                ) {
+                    Text("H5")
+                }
+            }
+        }
+    ) { padding ->
         NavHost(
             navController = navController,
             startDestination = MainTab.Home.route,

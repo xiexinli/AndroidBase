@@ -3,4 +3,12 @@
         <item name="android:windowLightStatusBar">true</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
     </style>
+
+    <style name="Theme.AndroidBase.WebViewDialog" parent="Theme.AndroidBase">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:backgroundDimAmount">0.32</item>
+        <item name="android:windowNoTitle">true</item>
+    </style>
 </resources>
