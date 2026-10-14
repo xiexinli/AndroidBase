@@ -8,9 +8,9 @@
 这些文件**不是会被编译或自动执行的代码**，它们的「生效」= **AI 助手在合适的时机读取它们**。因此：
 
 1. **发现目录取决于客户端**：
-   - 本工程的约定目录是 **`.dhcoder/`**（沿用工程原有的 `.dhcoder/skills/`）。
-   - 如果你的工具是 Claude Code，它默认只看 **`.claude/skills`**；Codex 默认看 **`.agents/skills`**。
-   - 若工具不读 `.dhcoder/`，需要做一次映射（软链或复制），否则 skill 不会被自动发现。
+   - 本工程的权威 skill 源目录是 **`.dhcoder/skills/`**。
+   - `.claude/skills/` 与 `.agents/skills/` 已配置为指向 `.dhcoder/skills/` 的软链，分别供 Claude Code 与 Codex 发现；不要复制出第二份 skill 源。
+   - 新增或移动 skill 后，确认两个软链入口仍可访问该 skill，并更新根 `AGENTS.md` 的路由。
 2. **入口唯一**：所有路由都从根目录 `AGENTS.md` 出发，它定义「什么时候读哪个文件」。
 3. **懒加载**：`rules/` 在改代码前读；`skills/<x>/SKILL.md` 在任务命中触发词时读；skill 的 `references/`、`scripts/`、`templates/` 只在 SKILL.md 里按需引用时才读。
 
@@ -215,10 +215,9 @@
 - **新增 skill**：建 `.dhcoder/skills/<name>/SKILL.md`，frontmatter 至少含 `name` 与 `description`；在 `AGENTS.md` 的「Skill 分层与路由」里登记触发规则。
 - **改名/移动**：同步更新 `AGENTS.md`、`REVIEW.md` 与其它 skill 中对它的引用。
 - **规则变更**：优先改 `.dhcoder/rules/` 或对应 skill，再回写 `AGENTS.md` 的索引。
-- **换客户端目录**：若工具读 `.claude/skills` 或 `.agents/skills`，把 `.dhcoder/skills` 软链/复制过去即可，内容无需改动。
+- **Skill 发现入口**：`.claude/skills` 与 `.agents/skills` 已是指向 `.dhcoder/skills` 的软链（见 §0）。新增或移动 skill 后确认两个入口仍能解析到它；不要复制出第二份 skill 源。
 
 ## 9. 可选的下一步
 
 1. 移植 SDD 治理框架（`task-level` + `prd-to-app-spec` + `Subagents/` + `docs/sdd` 模板），补齐 4.3 的上游闭环。
-2. 增加 `.claude/skills` / `.agents/skills` 兼容入口。
-3. 接入 Detekt/Ktlint，让 `code-style.md` 的约束可被自动校验。
+2. 接入 Detekt/Ktlint，让 `code-style.md` 的约束可被自动校验。

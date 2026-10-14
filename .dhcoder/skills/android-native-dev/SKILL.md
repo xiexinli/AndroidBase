@@ -627,45 +627,33 @@ A well-tested Android app uses layered testing: fast local unit tests for logic,
 
 Before adding test dependencies, inspect the project's existing versions to avoid conflicts:
 
-1. Check `gradle/libs.versions.toml` — if present, add test deps using the project's version catalog style
-2. Check existing `build.gradle` files for already-pinned dependency versions
-3. Match version families using the table below
+1. Check `gradle/libs.versions.toml` first and add test dependencies using the existing version-catalog aliases and conventions.
+2. Check module `build.gradle.kts` files for existing dependency aliases/usages; do not introduce inline dependency versions when a catalog entry can be used.
+3. Align related dependency families using the rules below, then add the corresponding catalog entries and module dependency aliases.
 
 **Version Alignment Rules**:
 
 | Test Dependency                              | Must Align With                                  | How to Check                                                          |
 |----------------------------------------------|--------------------------------------------------|-----------------------------------------------------------------------|
-| `kotlinx-coroutines-test`                    | Project's `kotlinx-coroutines-core` version      | Search for `kotlinx-coroutines` in build files or version catalog     |
-| `compose-ui-test-junit4`                     | Project's Compose BOM or `compose-compiler`      | Search for `compose-bom` or `compose.compiler` in build files         |
-| `espresso-*`                                 | All Espresso artifacts must use the same version  | Search for `espresso` in build files                                  |
-| `androidx.test:runner`, `rules`, `ext:junit` | Should use compatible AndroidX Test versions      | Search for `androidx.test` in build files                             |
-| `mockk`                                      | Must support the project's Kotlin version         | Check the Kotlin version in root `build.gradle` or other shared build config |
+| `kotlinx-coroutines-test`                    | Project's `kotlinx-coroutines-core` version      | Check the version catalog and existing module dependencies |
+| `compose-ui-test-junit4`                      | Project's Compose BOM or Compose compiler         | Check the version catalog and existing module dependencies |
+| `espresso-*`                                 | All Espresso artifacts must use the same version  | Check the version catalog |
+| `androidx.test:runner`, `rules`, `ext:junit` | Should use compatible AndroidX Test versions      | Check the version catalog |
+| `mockk`                                      | Must support the project's Kotlin version         | Check the Kotlin version in the version catalog |
 
-**Dependencies Reference** — add only the groups you need:
+**Dependencies Reference** — declare new versions in `gradle/libs.versions.toml` and add library aliases there; then reference those aliases from the module build script. The Kotlin DSL pattern is:
 
 ```kotlin
 dependencies {
-    // --- Local unit tests (src/test/) ---
-    testImplementation("junit:junit:<version>")                          // 4.13.2+
-    testImplementation("org.robolectric:robolectric:<version>")          // 4.16.1+
-    testImplementation("io.mockk:mockk:<version>")                      // match Kotlin version
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:<version>")  // match coroutines-core
-    testImplementation("androidx.arch.core:core-testing:<version>")      // InstantTaskExecutorRule for LiveData
-    testImplementation("app.cash.turbine:turbine:<version>")             // Flow/StateFlow testing
-
-    // --- Instrumentation tests (src/androidTest/) ---
-    androidTestImplementation("androidx.test.ext:junit:<version>")
-    androidTestImplementation("androidx.test:runner:<version>")
-    androidTestImplementation("androidx.test:rules:<version>")
-    androidTestImplementation("androidx.test.espresso:espresso-core:<version>")
-    androidTestImplementation("androidx.test.espresso:espresso-contrib:<version>")   // RecyclerView, Drawer
-    androidTestImplementation("androidx.test.espresso:espresso-intents:<version>")   // Intent verification
-    androidTestImplementation("androidx.test.espresso:espresso-idling-resource:<version>")
-    androidTestImplementation("androidx.test.uiautomator:uiautomator:<version>")
-
-    // --- Compose UI tests (only if project uses Compose) ---
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4")      // version from Compose BOM
-    debugImplementation("androidx.compose.ui:ui-test-manifest")          // required for createComposeRule
+    // Use existing catalog aliases where available; add catalog entries first when needed.
+    testImplementation(libs.junit)
+    testImplementation(libs.kotlinx.coroutines.test)
+    // Examples after adding matching aliases to libs.versions.toml:
+    // testImplementation(libs.robolectric)
+    // testImplementation(libs.mockk)
+    // testImplementation(libs.androidx.test.runner)
+    // androidTestImplementation(libs.androidx.test.ext.junit)
+    // androidTestImplementation(libs.androidx.espresso.core)
 }
 ```
 

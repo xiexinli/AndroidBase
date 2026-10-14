@@ -8,10 +8,13 @@
 | 信息 | 唯一事实源 |
 |---|---|
 | 项目开发约定（本文件） | `AGENTS.md` |
+| AI 配置总说明 | `.dhcoder/README.md` |
 | 技术栈 | `.dhcoder/rules/tech_stack.md`、`gradle/libs.versions.toml` |
 | 架构与分层边界 | `.dhcoder/rules/architecture.md` |
 | 编码风格 | `.dhcoder/rules/code-style.md` |
-| 通用 Skills | `.dhcoder/skills/` |
+| Skills（通用工作流 + Android 专项） | `.dhcoder/skills/`（`SKILL.md` 为入口） |
+| Skill 发现入口（软链到 `.dhcoder/skills/`） | `.claude/skills/`（Claude Code）、`.agents/skills/`（Codex） |
+| 需求 / 计划产物 | `docs/spec/`（Spec）、`docs/superpowers/plans/`（实现计划） |
 | 评审入口 | `REVIEW.md` |
 | 输出语言 | `.dhcoder/config.yaml`（简体中文） |
 
@@ -159,7 +162,11 @@ AndroidBase/
   - `prd-to-spec` → `writing-plans`：需求 → 技术 Spec → 分步实现计划。
   - `grill-me` / `grill-with-docs`：需要高强度审视方案与边界。
   - `caveman`：用户明确要求极简输出。
+  - `planning-with-files`：多步或研究型任务，或预计 >5 次工具调用、需要跨会话恢复时。
+  - `app-grill-pm`：PRD/功能简述在实施前需要产品行为、流程与验收澄清时。
+  - `prd-code-impact-architect`：只需 PRD 代码影响面分析、不做正式 Spec 也不实施代码时。
   - Android 专项：`android-native-dev`（开发/排障）、`android-verify`（编译/测试/验证）、`android-review`（评审）。
+- `to-prd` / `to-issues` / `triage` 首次使用前先运行 `setup-matt-pocock-skills` 配置 issue tracker 与标签；该 skill 会修改 `AGENTS.md` / `CLAUDE.md`，运行前先确认。
 
 ## 代码评审
 

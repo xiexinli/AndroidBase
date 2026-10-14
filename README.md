@@ -2,7 +2,7 @@
 
 基于 **Kotlin + Jetpack Compose + Clean Architecture + MVVM** 的可运行 Android 基础工程。
 
-采用三模块：**`:base`**（`com.android.library`，包名 `com.development.base`）承载可复用公共能力、基础设施、数据与领域层，可被其它业务工程直接依赖；**`:app`**（`com.android.application`，包名 `com.development.app`）承载主应用 UI、导航和页面状态以及 Hilt 入口与宿主配置；**`:demo`**（`com.android.application`，包名 `com.development.demo`）是只依赖 `:base` 的独立示例应用，独立承载折叠屏演示 UI，用来验证「只依赖 base 即可运行」。
+采用三模块：**`:base`**（`com.android.library`，包名 `com.development.base`）承载可复用公共能力、基础设施、数据与领域层，可被其它业务工程直接依赖；**`:app`**（`com.android.application`，包名 `com.development.app`）承载主应用 UI、导航和页面状态以及 Hilt 入口与宿主配置；**`:demo`**（`com.android.application`，包名 `com.development.demo`）是只依赖 `:base` 的独立示例应用，承载自适应/折叠屏演示、Compose 组件样例与列表示例，用来验证「只依赖 base 即可运行」。
 
 ## 已实现
 
@@ -30,10 +30,12 @@ app/src/main/java/com/development/app/       # :app —— 主应用与 UI
 ├── feature/                                  # 页面、导航与页面 ViewModel
 └── di/AppNetworkModule.kt                    # 向 :base 提供域名等运行期配置
 
-demo/src/main/java/com/development/demo/     # :demo —— 独立折叠屏演示 UI
+demo/src/main/java/com/development/demo/     # :demo —— 只依赖 :base 的示例应用
 ├── DemoApplication.kt                       # @HiltAndroidApp，继承 :base 的 BaseApplication
 ├── MainActivity.kt
-├── adaptive/                                 # demo 自己的 UI 与页面状态
+├── adaptive/                                 # 自适应 / 折叠屏演示 UI 与页面状态
+├── composables/                              # Compose 组件分类样例
+├── list/                                     # 列表示例
 └── di/DemoNetworkModule.kt                   # 向 :base 提供域名等运行期配置
 ```
 

@@ -85,7 +85,7 @@ Dependency direction: app/demo presentation depends on `:base` domain/use cases;
 - DI: **Hilt** everywhere (`@HiltViewModel`, `@HiltWorker`, `@Module`/`@InstallIn`).
 - Annotation processing: **KSP**, not kapt.
 - Images: go through `core/ui/AppImage`, never raw `AsyncImage` in feature code.
-- Network: unified `ApiResult` + `core/network` helpers (see `agent/rules` equivalents in `.dhcoder/rules/`).
+- Network: unified `ApiResult` + `core/network` helpers (see the project rules in `.dhcoder/rules/`).
 
 ## Python Tooling
 
