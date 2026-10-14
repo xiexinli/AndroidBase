@@ -75,6 +75,8 @@
 | `improve-codebase-architecture/DEEPENING.md` | 按依赖类型给出安全深化步骤 | 选定深化候选后 | 被 SKILL.md 引用 | 依赖 `LANGUAGE.md` 的术语 |
 | `improve-codebase-architecture/INTERFACE-DESIGN.md` | 「设计两遍」：为候选模块并行生成多个接口方案对比 | 需要比较接口方案时 | 被 SKILL.md 引用 | 出自 Ousterhout《设计两遍》 |
 | `improve-codebase-architecture/LANGUAGE.md` | 统一术语表：module / interface / seam / adapter / leverage | 该 skill 的所有建议中 | 被 SKILL.md 及其附件引用 | 要求严格用词，不要替换成「component/service/API」 |
+| `codebase-design/SKILL.md` | 设计深模块与简洁接口，检查接缝、依赖、局部性和测试面；遵守 AndroidBase 分层与 Hilt 约束 | 设计/重构模块接口、提升可测试性，或架构扫描选定候选后 | 与 `improve-codebase-architecture`（发现候选）及 `tdd`（实现验证）互补 | 已按 Kotlin/AndroidBase 约束适配；不主张为每个类强加 interface |
+| `domain-modeling/SKILL.md` | 澄清领域术语、概念关系与边界场景，并把已确认的语言/重要权衡沉淀到现有文档 | 讨论领域模型、术语冲突，或形成需要记录的架构决策时 | 沿用 `grill-with-docs/CONTEXT-FORMAT.md` 与 `ADR-FORMAT.md`，不造第二套格式 | 根目录 `CONTEXT.md` / `docs/adr/` 均按需创建 |
 | `prototype/SKILL.md` | 一次性原型：在动手前验证设计——逻辑分支走终端小应用，UI 分支走多方案切换页 | 需求不稳定、想先做可运行草案、探索设计选项 | 主入口，按问题类型路由到下列两文件 | 产物是「用完即弃」的 |
 | `prototype/LOGIC.md` | 逻辑原型：交互式终端小应用，手动驱动状态模型 | 问题是业务逻辑/状态迁移/数据结构 | 被 SKILL.md 引用 | — |
 | `prototype/UI.md` | UI 原型：一条路由下多个截然不同的界面方案，底部浮条切换 | 问题是「长什么样」 | 被 SKILL.md 引用 | — |
@@ -135,6 +137,12 @@
 | `setup-matt-pocock-skills/issue-tracker-local.md` | 本地 Markdown issue 约定（`.scratch/`） | 无远端 tracker 时 | 被 SKILL.md 引用 | 三选一，最轻量 |
 | `setup-matt-pocock-skills/triage-labels.md` | 把 skill 的五个标准角色映射到本仓实际标签串 | 配置分流标签时 | 被 `triage` 等引用 | 标签名可随仓而异 |
 
+### 4.7 按需外部研究
+
+| 文件 | 1. 作用 | 2. 生效时机 | 3. 搭配 | 4. 其他 |
+|---|---|---|---|---|
+| `research/SKILL.md` | 面向需要外部证据的问题，优先查一手来源、交叉核验并注明引用 | 用户要求研究/查证/对比，或答案依赖外部、时效性事实时 | 与 `planning-with-files`（复杂多步任务）互补；仓库内部事实直接读代码/文档 | 简单问答、只读本仓库和按已确认 Spec 实现不触发；研究文档仅复杂、可复用或用户要求时保存 |
+
 ---
 
 ## 5. `.dhcoder/skills/` — Android 专项 Skills
@@ -181,7 +189,10 @@
    planning-with-files（task_plan / findings / progress 三文件）
 
 ⑥ 任务拆解与分流
-   to-prd / to-issues / triage（首次需先跑 setup-matt-pocock-skills 配置 tracker 与标签）
+   to-prd / to-issues / triage（首次需先跑 setup-matt-poc-skills 配置 tracker 与标签）
+
+⑦ 外部技术调研（按需）
+   research（仅查证外部事实/官方资料；简单问答与本仓只读分析不触发）
 ```
 
 ---
