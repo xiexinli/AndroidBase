@@ -4,8 +4,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.material3.Surface
-import com.development.base.core.ui.AndroidBaseTheme
 import com.development.app.feature.main.MainRoute
+import com.development.app.theme.AppTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -13,7 +13,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            AndroidBaseTheme { Surface { MainRoute() } }
+            AppTheme { Surface { MainRoute() } }
         }
     }
 }

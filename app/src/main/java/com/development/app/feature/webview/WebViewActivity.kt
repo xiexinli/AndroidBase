@@ -17,7 +17,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.development.base.core.ui.AndroidBaseTheme
+import com.development.app.theme.AppTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 /** WebView Activity 的展示模式。 */
@@ -52,7 +52,7 @@ class WebViewActivity : ComponentActivity() {
 
         configureWindow(displayMode)
         setContent {
-            AndroidBaseTheme {
+            AppTheme {
                 WebViewActivityContent(
                     url = url,
                     displayMode = displayMode,
