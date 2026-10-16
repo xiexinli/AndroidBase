@@ -3,6 +3,7 @@ package com.development.demo.ui.composables
 import androidx.compose.runtime.Composable
 import com.development.demo.ui.composables.sections.AnimationSection
 import com.development.demo.ui.composables.sections.BasicsSection
+import com.development.demo.ui.composables.sections.ConstraintLayoutSection
 import com.development.demo.ui.composables.sections.EffectSection
 import com.development.demo.ui.composables.sections.InputSection
 import com.development.demo.ui.composables.sections.InteractionSection
@@ -35,6 +36,11 @@ internal val ComposablesCategories: List<ComposablesCategory> = listOf(
         title = "布局 Layout",
         summary = "Column / Row / Box / Spacer / weight / FlowRow 与尺寸修饰符",
     ) { LayoutSection() },
+    ComposablesCategory(
+        id = "constraint",
+        title = "约束布局 ConstraintLayout",
+        summary = "constrainAs / Guideline / Barrier / Chain / ConstraintSet",
+    ) { ConstraintLayoutSection() },
     ComposablesCategory(
         id = "basic",
         title = "基础组件 Basics",

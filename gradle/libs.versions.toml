@@ -20,6 +20,7 @@ datastore = "1.1.2"
 work = "2.10.0"
 hiltWork = "1.2.0"
 window = "1.5.1"
+constraintLayout = "1.1.2"
 timber = "5.0.1"
 junit = "4.13.2"
 
@@ -35,6 +36,7 @@ androidx-compose-ui-graphics = { module = "androidx.compose.ui:ui-graphics" }
 androidx-compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
 androidx-compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
 androidx-compose-material3 = { module = "androidx.compose.material3:material3" }
+androidx-constraintlayout-compose = { module = "androidx.constraintlayout:constraintlayout-compose", version.ref = "constraintLayout" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigation" }
 androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavigation" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
