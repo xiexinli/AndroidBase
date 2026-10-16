@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import com.development.base.core.ui.AndroidBaseTheme
 import com.development.demo.ui.adaptive.AdaptiveActivity
 import com.development.demo.ui.composables.ComposablesActivity
+import com.development.demo.ui.hilt.HiltActivity
 import dagger.hilt.android.AndroidEntryPoint
 
 /** demo 示例导航首页。 */
@@ -37,6 +38,7 @@ class MainActivity : ComponentActivity() {
                     DemoCatalogScreen(
                         onOpenAdaptive = { startActivity(Intent(this, AdaptiveActivity::class.java)) },
                         onOpenComposables = { startActivity(Intent(this, ComposablesActivity::class.java)) },
+                        onOpenHilt = { startActivity(Intent(this, HiltActivity::class.java)) },
                     )
                 }
             }
@@ -46,7 +48,11 @@ class MainActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun DemoCatalogScreen(onOpenAdaptive: () -> Unit, onOpenComposables: () -> Unit) {
+private fun DemoCatalogScreen(
+    onOpenAdaptive: () -> Unit,
+    onOpenComposables: () -> Unit,
+    onOpenHilt: () -> Unit,
+) {
     Scaffold(topBar = { TopAppBar(title = { Text("Demo 示例") }) }) { innerPadding ->
         LazyColumn(
             modifier = Modifier.fillMaxSize().padding(innerPadding),
@@ -64,6 +70,13 @@ private fun DemoCatalogScreen(onOpenAdaptive: () -> Unit, onOpenComposables: () 
                     title = "Compose 用法示例",
                     description = "浏览常用 Composable 分类与运行示例",
                     onClick = onOpenComposables,
+                )
+            }
+            item {
+                DemoEntry(
+                    title = "Hilt 用法示例",
+                    description = "注入方式、作用域、限定符、多绑定与易错点",
+                    onClick = onOpenHilt,
                 )
             }
         }

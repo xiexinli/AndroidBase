@@ -22,5 +22,8 @@
         <activity android:name=".ui.composables.ComposablesActivity" android:exported="false" />
         <activity android:name=".ui.list.ListActivity" android:exported="false" />
 
+        <!-- Hilt 用法示例，由首页入口打开。 -->
+        <activity android:name=".ui.hilt.HiltActivity" android:exported="false" />
+
     </application>
 </manifest>
