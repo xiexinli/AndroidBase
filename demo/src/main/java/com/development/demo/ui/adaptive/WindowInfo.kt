@@ -1,4 +1,4 @@
-package com.development.demo.adaptive
+package com.development.demo.ui.adaptive
 
 import androidx.activity.compose.LocalActivity
 import androidx.compose.runtime.Composable

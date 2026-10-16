@@ -1,4 +1,8 @@
-package com.development.demo.composables
+package com.development.demo.ui.composables.sections
+
+import com.development.demo.ui.composables.ExampleBlock
+import com.development.demo.ui.composables.ExampleLabel
+import com.development.demo.ui.composables.ResultText
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background

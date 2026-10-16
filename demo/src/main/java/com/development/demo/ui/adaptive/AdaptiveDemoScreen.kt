@@ -1,4 +1,4 @@
-package com.development.demo.adaptive
+package com.development.demo.ui.adaptive
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box

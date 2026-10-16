@@ -1,4 +1,4 @@
-package com.development.demo.list
+package com.development.demo.ui.list
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -10,7 +10,7 @@ import dagger.hilt.android.AndroidEntryPoint
 /**
  * 分页列表示例的入口 Activity。
  *
- * 入口在「Compose 用法示例」页（[com.development.demo.composables.ComposablesActivity]）的目录里，
+ * 入口在「Compose 用法示例」页（[com.development.demo.ui.composables.ComposablesActivity]）的目录里，
  * 不单独注册 LAUNCHER。
  *
  * 数据是刻意伪造的演示数据，由 [ListViewModel] 生成，不接入 `:base` 的网络与缓存。

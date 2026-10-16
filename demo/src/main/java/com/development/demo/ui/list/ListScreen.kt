@@ -1,4 +1,4 @@
-package com.development.demo.list
+package com.development.demo.ui.list
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement

@@ -1,4 +1,4 @@
-package com.development.demo.composables
+package com.development.demo.ui.composables
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box

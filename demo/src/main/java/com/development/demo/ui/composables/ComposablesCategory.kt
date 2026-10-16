@@ -1,6 +1,17 @@
-package com.development.demo.composables
+package com.development.demo.ui.composables
 
 import androidx.compose.runtime.Composable
+import com.development.demo.ui.composables.sections.AnimationSection
+import com.development.demo.ui.composables.sections.BasicsSection
+import com.development.demo.ui.composables.sections.EffectSection
+import com.development.demo.ui.composables.sections.InputSection
+import com.development.demo.ui.composables.sections.InteractionSection
+import com.development.demo.ui.composables.sections.LayoutSection
+import com.development.demo.ui.composables.sections.ListSection
+import com.development.demo.ui.composables.sections.OverlaySection
+import com.development.demo.ui.composables.sections.PitfallSection
+import com.development.demo.ui.composables.sections.StateSection
+import com.development.demo.ui.composables.sections.ThemeSection
 
 /**
  * 「一类 Composable」的示例定义，对应目录页里的一条二级页面。

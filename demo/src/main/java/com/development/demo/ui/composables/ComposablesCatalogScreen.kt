@@ -1,4 +1,4 @@
-package com.development.demo.composables
+package com.development.demo.ui.composables
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -30,7 +30,7 @@ import androidx.compose.ui.unit.dp
  * 一级页面：Composable 用法分类目录（本示例的入口页）。
  *
  * 除分类列表外，顶部还挂了一个完整页面级的示例入口（分页列表），它跳转到独立的
- * [com.development.demo.list.ListActivity]，不属于分类详情。
+ * [com.development.demo.ui.list.ListActivity]，不属于分类详情。
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

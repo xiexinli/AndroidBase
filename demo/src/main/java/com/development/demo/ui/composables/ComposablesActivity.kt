@@ -1,4 +1,4 @@
-package com.development.demo.composables
+package com.development.demo.ui.composables
 
 import android.content.Intent
 import android.os.Bundle
@@ -12,7 +12,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.development.base.core.ui.AndroidBaseTheme
-import com.development.demo.list.ListActivity
+import com.development.demo.ui.list.ListActivity
 
 /** 目录页路由。 */
 private const val CatalogRoute = "composables/catalog"
