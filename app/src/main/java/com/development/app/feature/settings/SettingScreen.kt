@@ -38,7 +38,7 @@ fun SettingRoute(
         Column(Modifier.fillMaxSize().padding(padding)) {
             SettingItem(
                 title = "深色模式",
-                summary = (themeMode ?: ThemeMode.Default).summary(),
+                summary = themeMode.summary(),
                 onClick = onDarkModeClick
             )
             HorizontalDivider()

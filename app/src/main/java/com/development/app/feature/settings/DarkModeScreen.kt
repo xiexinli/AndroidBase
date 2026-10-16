@@ -39,7 +39,7 @@ fun DarkModeRoute(
     viewModel: ThemeSettingsViewModel = hiltViewModel()
 ) {
     val themeMode by viewModel.themeMode.collectAsStateWithLifecycle()
-    val mode = themeMode ?: ThemeMode.Default
+    val mode = themeMode
     val followSystem = mode == ThemeMode.FOLLOW_SYSTEM
 
     Scaffold(topBar = { SettingsTopBar(title = "深色模式", onBack = onBack) }) { padding ->

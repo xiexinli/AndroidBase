@@ -26,3 +26,12 @@ fun AndroidBaseTheme(
 ) {
     MaterialTheme(colorScheme = if (darkTheme) DarkColors else LightColors, content = content)
 }
+
+/**
+ * 主题背景色。
+ *
+ * 供拿不到 Compose 主题的地方取用（如 Activity 建窗时设置启动窗口背景色），
+ * 保证与 [AndroidBaseTheme] 的 `colorScheme.background` 同源，不在业务代码里另写一份色值。
+ */
+fun appBackgroundColor(darkTheme: Boolean): Color =
+    (if (darkTheme) DarkColors else LightColors).background

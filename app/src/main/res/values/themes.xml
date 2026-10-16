@@ -4,6 +4,15 @@
         <item name="android:statusBarColor">@android:color/transparent</item>
     </style>
 
+    <!--
+      应用内深色模式由用户设置决定，而系统在应用代码运行之前生成的「启动预览窗口」
+      只能取 XML 主题里的浅色 windowBackground，打开瞬间会闪一下浅色。
+      关掉预览后，上一页会一直显示到首帧绘制完成，不再出现浅色一闪。
+    -->
+    <style name="Theme.AndroidBase.NoPreview" parent="Theme.AndroidBase">
+        <item name="android:windowDisablePreview">true</item>
+    </style>
+
     <style name="Theme.AndroidBase.WebViewDialog" parent="Theme.AndroidBase">
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>

@@ -5,28 +5,31 @@ import androidx.lifecycle.viewModelScope
 import com.development.base.domain.model.ThemeMode
 import com.development.base.domain.usecase.ThemeSettingsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-
-private const val StopTimeoutMillis = 5_000L
 
 /**
  * 应用主题状态：读取并写入持久化的 [ThemeMode]。
  *
- * 主题壳与设置页面都复用本 ViewModel；多个实例订阅同一份偏好，任一处修改都会同步到全部页面。
+ * 初始值取自 [AppThemeState] 的同步快照，而不是等偏好回调，避免深色模式下首帧按浅色渲染、
+ * 打开页面时闪一下浅色；主题壳与设置页面都复用本 ViewModel。
  */
 @HiltViewModel
 class ThemeSettingsViewModel @Inject constructor(
-    private val themeSettings: ThemeSettingsUseCase
+    private val themeSettings: ThemeSettingsUseCase,
+    appThemeState: AppThemeState
 ) : ViewModel() {
-    /** 当前主题模式；null 表示偏好尚未读出，UI 按 [ThemeMode.Default] 处理。 */
-    val themeMode: StateFlow<ThemeMode?> = themeSettings.themeMode
-        .map<ThemeMode, ThemeMode?> { it }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(StopTimeoutMillis), null)
+    private val _themeMode = MutableStateFlow(appThemeState.themeMode)
+
+    /** 当前主题模式。 */
+    val themeMode: StateFlow<ThemeMode> = _themeMode.asStateFlow()
+
+    init {
+        viewModelScope.launch { themeSettings.themeMode.collect { _themeMode.value = it } }
+    }
 
     /** 保存主题模式。 */
     fun setThemeMode(mode: ThemeMode) {

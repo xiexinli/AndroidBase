@@ -52,7 +52,7 @@ class WebViewActivity : ComponentActivity() {
 
         configureWindow(displayMode)
         setContent {
-            AppTheme {
+            AppTheme(transparentWindow = true) {
                 WebViewActivityContent(
                     url = url,
                     displayMode = displayMode,

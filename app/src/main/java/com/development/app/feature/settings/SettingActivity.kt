@@ -21,7 +21,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.development.app.theme.AppTheme
+import com.development.app.theme.AppThemeState
+import com.development.app.theme.applyThemeWindowBackground
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 /**
  * 设置页面：可独立启动的 Activity，内部两级导航。
@@ -31,8 +34,12 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class SettingActivity : ComponentActivity() {
 
+    @Inject lateinit var appThemeState: AppThemeState
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // 先定窗口启动背景，避免深色模式下打开本页瞬间闪一下浅色。
+        applyThemeWindowBackground(appThemeState.themeMode)
         setContent {
             AppTheme {
                 Surface(Modifier.fillMaxSize()) {
