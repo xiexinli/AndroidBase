@@ -1,0 +1,24 @@
+name: flutterdemo
+description: "AndroidBase 仓库内的独立 Flutter 示例工程：Home / IM / Account 三个 Tab，Home 为 Flutter 控件与用法示例的入口。"
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.13.5
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # 网络请求示例（network_example.dart）使用。
+  http: ^1.2.0
+  cupertino_icons: ^1.0.8
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true

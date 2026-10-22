@@ -1,0 +1,12 @@
+analyzer:
+  exclude:
+    - build/**
+    - android/**
+    - ios/**
+include: package:flutter_lints/flutter.yaml
+
+linter:
+  rules:
+    # 示例代码刻意演示「非 const」的反面写法，这里不强制。
+    prefer_const_constructors: false
+    prefer_const_literals_to_create_immutables: false
